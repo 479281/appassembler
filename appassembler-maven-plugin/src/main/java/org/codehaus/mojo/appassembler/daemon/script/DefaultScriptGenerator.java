@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.daemon.script;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2007 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,21 +24,6 @@ package org.codehaus.mojo.appassembler.daemon.script;
  * SOFTWARE.
  */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import org.codehaus.mojo.appassembler.daemon.DaemonGeneratorException;
 import org.codehaus.mojo.appassembler.model.Daemon;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -46,114 +31,30 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 /**
  * @author <a href="mailto:trygve.laugstol@objectware.no">Trygve Laugst&oslash;l</a>
- * @version $Id: DefaultScriptGenerator.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * @version $Id: DefaultScriptGenerator.java 12569 2010-09-15 20:26:27Z dennisl $
  * @plexus.component
  */
 public class DefaultScriptGenerator
     extends AbstractLogEnabled
     implements ScriptGenerator
 {
-
-    private static final String DEFAULT_LICENSE_HEADER = "default-license-header.txt";
-
-    private boolean isDefaultLicenseHeaderRequested( Daemon daemon )
-    {
-        if ( daemon.getLicenseHeaderFile() == null )
-        {
-            return true;
-        }
-
-        if ( daemon.getLicenseHeaderFile().trim().length() > 0 )
-        {
-            return false;
-        }
-
-        return false;
-    }
-
-    private String getLicenseHeader( Platform platform, Daemon daemon )
-        throws DaemonGeneratorException
-    {
-        List lines = null;
-        if ( isDefaultLicenseHeaderRequested( daemon ) )
-        {
-            getLogger().debug( "Using default licence file (" + DEFAULT_LICENSE_HEADER + "." );
-            lines = readLicenseHeader();
-        }
-        else
-        {
-            getLogger().debug( "Using license file: " + daemon.getLicenseHeaderFile() );
-            lines = readLicenseHeaderFromFile( new File( daemon.getLicenseHeaderFile() ) );
-        }
-        StringBuffer resultLines = new StringBuffer();
-        for ( int i = 0; i < lines.size(); i++ )
-        {
-            String licenseLine = platform.getCommentPrefix() + lines.get( i );
-            resultLines.append( licenseLine.trim() + platform.getNewLine() );
-        }
-        return resultLines.toString();
-    }
-
-    private List readLicenseHeader()
-        throws DaemonGeneratorException
-    {
-        ArrayList result = new ArrayList();
-
-        InputStream in = getClass().getResourceAsStream( DEFAULT_LICENSE_HEADER );
-
-        InputStreamReader inr = new InputStreamReader( in );
-        try
-        {
-            BufferedReader bufRead = new BufferedReader( inr );
-            String str;
-            while ( ( str = bufRead.readLine() ) != null )
-            {
-                result.add( str );
-            }
-            bufRead.close();
-        }
-        catch ( IOException e )
-        {
-            throw new DaemonGeneratorException(
-                                                "Internal error: could not read license header template file (license-header.txt)" );
-        }
-        return result;
-    }
-
-    private List readLicenseHeaderFromFile( File licenseHeader )
-        throws DaemonGeneratorException
-    {
-        ArrayList result = new ArrayList();
-        try
-        {
-            BufferedReader in = new BufferedReader( new FileReader( licenseHeader ) );
-            String str;
-            while ( ( str = in.readLine() ) != null )
-            {
-                result.add( str );
-            }
-            in.close();
-        }
-        catch ( IOException e )
-        {
-            throw new DaemonGeneratorException( "Internal error: could not read license header template file "
-                + licenseHeader.getName() );
-        }
-        return result;
-    }
-
     // -----------------------------------------------------------------------
     // ScriptGenerator Implementation
     // -----------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.codehaus.mojo.appassembler.daemon.script.ScriptGenerator#createBinScript(java.lang.String,
-     * org.codehaus.mojo.appassembler.model.Daemon, java.io.File, java.lang.String)
-     */
-    public void createBinScript( String platformName, Daemon daemon, File outputDirectory, String binFolder )
+    public void createBinScript( String platformName, Daemon daemon, File outputDirectory )
         throws DaemonGeneratorException
     {
         Platform platform = Platform.getInstance( platformName );
@@ -164,9 +65,15 @@ public class DefaultScriptGenerator
 
         try
         {
-            in = getScriptTemplate( platformName, daemon );
+            in = getClass().getResourceAsStream( platformName + "BinTemplate" );
 
-            InputStreamReader reader = new InputStreamReader( getScriptTemplate( platformName, daemon ) );
+            if ( in == null )
+            {
+                throw new DaemonGeneratorException(
+                    "Internal error: could not find template for platform '" + platformName + "'." );
+            }
+
+            InputStreamReader reader = new InputStreamReader( in );
 
             Map context = new HashMap();
             context.put( "MAINCLASS", daemon.getMainClass() );
@@ -175,16 +82,13 @@ public class DefaultScriptGenerator
             context.put( "APP_NAME", daemon.getId() );
             context.put( "ENV_SETUP", platform.getEnvSetup( daemon ) );
             context.put( "REPO", daemon.getRepositoryName() );
-            context.put( "LICENSE_HEADER", getLicenseHeader( platform, daemon ) );
             if ( platform.isShowConsoleWindow( daemon ) )
             {
                 context.put( "JAVA_BINARY", "java" );
-                context.put( "UNIX_BACKGROUND", "" );
             }
             else
             {
                 context.put( "JAVA_BINARY", "start /min javaw" );
-                context.put( "UNIX_BACKGROUND", " &" );
             }
 
             String appArguments = platform.getAppArguments( daemon );
@@ -220,13 +124,13 @@ public class DefaultScriptGenerator
                 programName = daemon.getId();
             }
 
-            File binDir = new File( outputDirectory, binFolder );
+            File binDir = new File( outputDirectory, "bin" );
             FileUtils.forceMkdir( binDir );
             File binFile = new File( binDir, programName + platform.getBinFileExtension() );
 
             out = new FileWriter( binFile );
             getLogger().debug( "Writing shell file for platform '" + platform.getName() + "' to '"
-                                   + binFile.getAbsolutePath() + "'." );
+                + binFile.getAbsolutePath() + "'." );
 
             IOUtil.copy( interpolationFilterReader, out );
         }
@@ -243,54 +147,5 @@ public class DefaultScriptGenerator
             IOUtil.close( out );
             IOUtil.close( in );
         }
-    }
-
-    private InputStream getScriptTemplate( String platformName, Daemon daemon )
-        throws DaemonGeneratorException
-    {
-        InputStream is = null;
-
-        try
-        {
-            String customTemplate = daemon.getWindowsScriptTemplate();
-            if ( Platform.UNIX_NAME.equals( platformName ) )
-            {
-                customTemplate = daemon.getUnixScriptTemplate();
-            }
-
-            if ( customTemplate != null )
-            {
-                File customTemplateFile = new File( customTemplate );
-                if ( customTemplateFile.exists() )
-                {
-                    is = new FileInputStream( customTemplateFile );
-                }
-                else
-                {
-                    is = getClass().getClassLoader().getResourceAsStream( customTemplate );
-                    if ( is == null )
-                    {
-                        throw new DaemonGeneratorException( "Unable to load external template resource: "
-                            + customTemplate );
-                    }
-                }
-            }
-            else
-            {
-                is = getClass().getResourceAsStream( platformName + "BinTemplate" );
-                if ( is == null )
-                {
-                    throw new DaemonGeneratorException( "Unable to load internal template resource: " + platformName
-                        + "BinTemplate" );
-                }
-            }
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new DaemonGeneratorException( "Unable to load external template file", e );
-        }
-
-        return is;
-
     }
 }

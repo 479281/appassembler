@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.daemon.booter;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2007 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -40,11 +40,8 @@ import org.codehaus.mojo.appassembler.model.Directory;
 import org.codehaus.mojo.appassembler.model.JvmSettings;
 
 /**
- * This contains all common code which is used in the {@link UnixBooterDaemonGenerator} and in the
- * {@link WindowsBooterDaemonGenerator}.
- * 
  * @author <a href="mailto:trygve.laugstol@objectware.no">Trygve Laugst&oslash;l</a>
- * @version $Id: AbstractBooterDaemonGenerator.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * @version $Id: AbstractBooterDaemonGenerator.java 9147 2009-03-04 23:18:27Z trygvis $
  */
 public abstract class AbstractBooterDaemonGenerator
     extends AbstactScriptDaemonGenerator
@@ -116,11 +113,12 @@ public abstract class AbstractBooterDaemonGenerator
                                                    request.getRepositoryLayout() ) );
         classpath.addDependency( createDependency( project, "org.codehaus.plexus:plexus-utils",
                                                    request.getRepositoryLayout() ) );
-        classpath.addDependency( createDependency( project, "stax:stax-api", request.getRepositoryLayout() ) );
-        classpath.addDependency( createDependency( project, "stax:stax", request.getRepositoryLayout() ) );
-
-        // FIXME: Check if this is correct new File("bin") ?
-        scriptGenerator.createBinScript( getPlatformName(), booterDaemon, outputDirectory, "bin" );
+        classpath.addDependency( createDependency( project, "stax:stax-api",
+                                                   request.getRepositoryLayout() ) );
+        classpath.addDependency( createDependency( project, "stax:stax",
+                                                   request.getRepositoryLayout() ) );
+        
+        scriptGenerator.createBinScript( getPlatformName(), booterDaemon, outputDirectory );
     }
 
     // -----------------------------------------------------------------------

@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.daemon.script;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2007 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,10 +24,14 @@ package org.codehaus.mojo.appassembler.daemon.script;
  * SOFTWARE.
  */
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
+import org.codehaus.mojo.appassembler.daemon.DaemonGeneratorException;
+import org.codehaus.mojo.appassembler.model.ClasspathElement;
+import org.codehaus.mojo.appassembler.model.Daemon;
+import org.codehaus.mojo.appassembler.model.Dependency;
+import org.codehaus.mojo.appassembler.model.Directory;
+import org.codehaus.mojo.appassembler.model.JvmSettings;
+import org.codehaus.plexus.util.StringUtils;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,30 +39,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.mojo.appassembler.daemon.DaemonGeneratorException;
-import org.codehaus.mojo.appassembler.model.ClasspathElement;
-import org.codehaus.mojo.appassembler.model.Daemon;
-import org.codehaus.mojo.appassembler.model.Dependency;
-import org.codehaus.mojo.appassembler.model.Directory;
-import org.codehaus.mojo.appassembler.model.JvmSettings;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.InterpolationFilterReader;
-import org.codehaus.plexus.util.StringUtils;
-
 /**
  * @author <a href="mailto:trygve.laugstol@objectware.no">Trygve Laugst&oslash;l</a>
- * @version $Id: Platform.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * @version $Id: Platform.java 12569 2010-09-15 20:26:27Z dennisl $
  */
 public class Platform
 {
-    /**
-     * Unix as Platform name.
-     */
     public static final String UNIX_NAME = "unix";
 
-    /**
-     * Windows Platform name.
-     */
     public static final String WINDOWS_NAME = "windows";
 
     private static final Map ALL_PLATFORMS;
@@ -91,15 +79,6 @@ public class Platform
         return platform;
     }
 
-    /**
-     * Get an instance of the named platform.
-     * 
-     * @param platformName
-     *            The name of the wished platform.
-     * @return Instance of the platform.
-     * @throws DaemonGeneratorException
-     *             in case of an wrong platformname.
-     */
     public static Platform getInstance( String platformName )
         throws DaemonGeneratorException
     {
@@ -113,52 +92,22 @@ public class Platform
         return platform;
     }
 
-    /**
-     * Get the names of all available platforms.
-     * 
-     * @return The names of the platform.
-     */
     public static Set getAllPlatformNames()
     {
         return ALL_PLATFORMS.keySet();
     }
 
-    /**
-     * Get all platforms.
-     * 
-     * @return All platforms.
-     */
     public static Set getAllPlatforms()
     {
         return new HashSet( ALL_PLATFORMS.values() );
     }
 
-    /**
-     * Redefine the list of platforms with the given one.
-     * 
-     * @param platformList
-     *            The new list of platforms.
-     * @return The redefined platforms set.
-     * @throws DaemonGeneratorException
-     *             in case of an error.
-     */
     public static Set getPlatformSet( List platformList )
         throws DaemonGeneratorException
     {
         return getPlatformSet( platformList, new HashSet( ALL_PLATFORMS.values() ) );
     }
 
-    /**
-     * Get back all platforms.
-     * 
-     * @param platformList
-     *            The list of platforms.
-     * @param allSet
-     *            The all set list.
-     * @return Get the platform sets.
-     * @throws DaemonGeneratorException
-     *             in case of an error.
-     */
     public static Set getPlatformSet( List platformList, Set allSet )
         throws DaemonGeneratorException
     {
@@ -177,7 +126,7 @@ public class Platform
             }
 
             throw new DaemonGeneratorException(
-                                                "The special platform 'all' can only be used if it is the only element in the platform list." );
+                "The special platform 'all' can only be used if it is the only element in the platform list." );
         }
 
         Set platformSet = new HashSet();
@@ -189,7 +138,7 @@ public class Platform
             if ( platformName.equals( "all" ) )
             {
                 throw new DaemonGeneratorException(
-                                                    "The special platform 'all' can only be used if it is the only element in a platform list." );
+                    "The special platform 'all' can only be used if it is the only element in a platform list." );
             }
 
             platformSet.add( getInstance( platformName ) );
@@ -215,82 +164,40 @@ public class Platform
     // The platform-specific bits
     // -----------------------------------------------------------------------
 
-    /**
-     * The interpolation token either for windows or unix.
-     * 
-     * @return The token which is used.
-     */
     public String getInterpolationToken()
     {
         return isWindows ? "#" : "@";
     }
 
-    /**
-     * @return The binary extension.
-     */
     public String getBinFileExtension()
     {
         return binFileExtension;
     }
 
-    /**
-     * @return BASEDIR representation for windows or unix.
-     */
     public String getBasedir()
     {
         return isWindows ? "\"%BASEDIR%\"" : "\"$BASEDIR\"";
     }
 
-    /**
-     * @return REPO representation for windows or unix.
-     */
     public String getRepo()
     {
         return isWindows ? "\"%REPO%\"" : "\"$REPO\"";
     }
 
-    /**
-     * @return The separator for windows or unix.
-     */
     public String getSeparator()
     {
         return isWindows ? "\\" : "/";
     }
 
-    /**
-     * @return The path separator for windows or unix.
-     */
     public String getPathSeparator()
     {
         return isWindows ? ";" : ":";
-    }
-
-    /**
-     * @return Comment prefix for windows or unix.
-     */
-    public String getCommentPrefix()
-    {
-        return isWindows ? "@REM " : "# ";
-    }
-
-    public String getNewLine()
-    {
-        return isWindows ? "\r\n" : "\n";
     }
 
     // -----------------------------------------------------------------------
     // This part depend on the platform-specific parts
     // -----------------------------------------------------------------------
 
-    /**
-     * Get the ClassPath based on the given Daemon.
-     * 
-     * @param daemon
-     *            The Daemon instance.
-     * @return The classpath as a string.
-     * @throws DaemonGeneratorException
-     *             in case of an error.
-     */
     public String getClassPath( Daemon daemon )
         throws DaemonGeneratorException
     {
@@ -329,62 +236,14 @@ public class Platform
                 throw new DaemonGeneratorException( "Unknown classpath element type: " + object.getClass().getName() );
             }
 
-            classpathBuffer.append( StringUtils.replace( ( (ClasspathElement) object ).getRelativePath(), "/",
-                                                         getSeparator() ) );
+            classpathBuffer.append( StringUtils.replace( ( (ClasspathElement) object ).getRelativePath(),
+                                                         "/", getSeparator() ) );
         }
 
         return classpathBuffer.toString();
     }
 
-    private String interpolateBaseDirAndRepo( String content )
-    {
-        StringReader sr = new StringReader( content );
-        StringWriter result = new StringWriter();
-
-        Map context = new HashMap();
-
-        context.put( "BASEDIR", StringUtils.quoteAndEscape( getBasedir(), '"' ) );
-        context.put( "REPO", StringUtils.quoteAndEscape( getRepo(), '"' ) );
-        InterpolationFilterReader interpolationFilterReader = new InterpolationFilterReader( sr, context, "@", "@" );
-        try
-        {
-            IOUtil.copy( interpolationFilterReader, result );
-        }
-        catch ( IOException e )
-        {
-            // shouldn't happen...
-        }
-        return result.toString();
-    }
-
-    private List convertArguments( List strings )
-    {
-        if ( strings == null )
-        {
-            return strings;
-        }
-
-        ArrayList result = new ArrayList();
-        for ( Iterator iterator = strings.iterator(); iterator.hasNext(); )
-        {
-            String argument = (String) iterator.next();
-            result.add( interpolateBaseDirAndRepo( argument ) );
-        }
-
-        return result;
-    }
-
-    /**
-     * Get the extra JVMArguments.
-     * 
-     * @param jvmSettings
-     *            The JVM settings
-     * @return The created string which contains <code>-X</code> options for the JVM settings.
-     * @throws IOException
-     *             in case of an error.
-     */
     public String getExtraJvmArguments( JvmSettings jvmSettings )
-        throws IOException
     {
         if ( jvmSettings == null )
         {
@@ -397,7 +256,7 @@ public class Platform
         vmArgs = addJvmSetting( "-Xmx", jvmSettings.getMaxMemorySize(), vmArgs );
         vmArgs = addJvmSetting( "-Xss", jvmSettings.getMaxStackSize(), vmArgs );
 
-        vmArgs += arrayToString( convertArguments( jvmSettings.getExtraArguments() ), "" );
+        vmArgs += arrayToString( jvmSettings.getExtraArguments(), "" );
         vmArgs += arrayToString( jvmSettings.getSystemProperties(), "-D" );
 
         return vmArgs.trim();
@@ -429,16 +288,9 @@ public class Platform
         return string;
     }
 
-    /**
-     * Get the application arguments.
-     * 
-     * @param descriptor
-     *            Instance of the daemon descriptor.
-     * @return The list of application arguments.
-     */
     public String getAppArguments( Daemon descriptor )
     {
-        List commandLineArguments = convertArguments( descriptor.getCommandLineArguments() );
+        List commandLineArguments = descriptor.getCommandLineArguments();
 
         if ( commandLineArguments == null || commandLineArguments.size() == 0 )
         {
@@ -472,13 +324,6 @@ public class Platform
         return vmArgs + " " + argType + extraJvmArgument;
     }
 
-    /**
-     * Get the environment setup file.
-     * 
-     * @param daemon
-     *            The instance of the Daemon for which this is beeing produced.
-     * @return The created string which contains the path to the setup file.
-     */
     public String getEnvSetup( Daemon daemon )
     {
         String envSetup = "";
@@ -489,7 +334,7 @@ public class Platform
         {
             if ( isWindows )
             {
-                String envScriptPath = "\"%BASEDIR%\\bin\\" + envSetupFileName + ".bat\"";
+                String envScriptPath = "%BASEDIR%\\bin\\" + envSetupFileName + ".bat";
 
                 envSetup = "if exist " + envScriptPath + " call " + envScriptPath;
             }
@@ -507,10 +352,6 @@ public class Platform
     // Object overrides
     // -----------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     public boolean equals( Object o )
     {
         if ( this == o )
@@ -528,45 +369,25 @@ public class Platform
         return name.equals( platform.name );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     public int hashCode()
     {
         return name.hashCode();
     }
 
-    /**
-     * The name of the platform.
-     * 
-     * @return The name of the platform.
-     */
     public String getName()
     {
         return name;
     }
 
-    /**
-     * ShowConsole window.
-     * 
-     * @param daemon
-     * @return true yes false otherwise.
-     */
     public boolean isShowConsoleWindow( Daemon daemon )
     {
-        return daemon.isShowConsoleWindow();
+        return daemon.isShowConsoleWindow() && isWindows;
     }
 
     // -----------------------------------------------------------------------
     // Setters for the platform-specific bits
     // -----------------------------------------------------------------------
 
-    /**
-     * Set the bin file extension.
-     * 
-     * @param binFileExtension The extension of the binary file.
-     */
     public void setBinFileExtension( String binFileExtension )
     {
         // We can't have a null extension

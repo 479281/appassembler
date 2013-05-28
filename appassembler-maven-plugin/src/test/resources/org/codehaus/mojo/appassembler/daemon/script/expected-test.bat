@@ -1,21 +1,19 @@
 @REM ----------------------------------------------------------------------------
-@REM  Copyright 2001-2006 The Apache Software Foundation.
+@REM Copyright 2001-2004 The Apache Software Foundation.
 @REM
-@REM  Licensed under the Apache License, Version 2.0 (the "License");
-@REM  you may not use this file except in compliance with the License.
-@REM  You may obtain a copy of the License at
+@REM Licensed under the Apache License, Version 2.0 (the "License");
+@REM you may not use this file except in compliance with the License.
+@REM You may obtain a copy of the License at
 @REM
-@REM       http://www.apache.org/licenses/LICENSE-2.0
+@REM      http://www.apache.org/licenses/LICENSE-2.0
 @REM
-@REM  Unless required by applicable law or agreed to in writing, software
-@REM  distributed under the License is distributed on an "AS IS" BASIS,
-@REM  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-@REM  See the License for the specific language governing permissions and
-@REM  limitations under the License.
+@REM Unless required by applicable law or agreed to in writing, software
+@REM distributed under the License is distributed on an "AS IS" BASIS,
+@REM WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+@REM See the License for the specific language governing permissions and
+@REM limitations under the License.
 @REM ----------------------------------------------------------------------------
 @REM
-@REM   Copyright (c) 2001-2006 The Apache Software Foundation.  All rights
-@REM   reserved.
 
 @echo off
 
@@ -65,25 +63,26 @@ goto repoSetup
 set BASEDIR=%~dp0\..
 
 :repoSetup
-if exist "%BASEDIR%\bin\setup.bat" call "%BASEDIR%\bin\setup.bat"
+if exist %BASEDIR%\bin\setup.bat call %BASEDIR%\bin\setup.bat
 
 if "%JAVACMD%"=="" set JAVACMD=java
 
 if "%REPO%"=="" set REPO=%BASEDIR%\repo
 
 set CLASSPATH=
+set EXTRA_JVM_ARGUMENTS=Yo dude
 goto endInit
 
 @REM Reaching here means variables are defined and arguments have been captured
 :endInit
 
-%JAVACMD% %JAVA_OPTS% Yo dude -classpath %CLASSPATH_PREFIX%;%CLASSPATH% -Dapp.name="test" -Dapp.repo="%REPO%" -Dapp.home="%BASEDIR%" -Dbasedir="%BASEDIR%" foo.Bar %CMD_LINE_ARGS%
-if %ERRORLEVEL% NEQ 0 goto error
+%JAVACMD% %JAVA_OPTS% %EXTRA_JVM_ARGUMENTS% -classpath %CLASSPATH_PREFIX%;%CLASSPATH% -Dapp.name="test" -Dapp.repo="%REPO%" -Dbasedir="%BASEDIR%" foo.Bar %CMD_LINE_ARGS%
+if ERRORLEVEL 1 goto error
 goto end
 
 :error
 if "%OS%"=="Windows_NT" @endlocal
-set ERROR_CODE=%ERRORLEVEL%
+set ERROR_CODE=1
 
 :end
 @REM set local scope for the variables with windows NT shell
@@ -95,9 +94,7 @@ set CMD_LINE_ARGS=
 goto postExec
 
 :endNT
-@REM If error code is set to 1 then the endlocal was done already in :error.
-if %ERROR_CODE% EQU 0 @endlocal
-
+@endlocal
 
 :postExec
 

@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.repository;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2007 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -32,10 +32,9 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
 /**
  * The code in this class is taken from DefaultRepositorylayout, located at:
- * http://svn.apache.org/viewvc/maven/components/trunk/maven-artifact/src/main/java/org/apache/maven/artifact/repository
- * /layout/DefaultRepositoryLayout.java
- * 
- * @version $Id: FlatRepositoryLayout.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * http://svn.apache.org/viewvc/maven/components/trunk/maven-artifact/src/main/java/org/apache/maven/artifact/repository/layout/DefaultRepositoryLayout.java
+ *
+ * @version $Id: FlatRepositoryLayout.java 9147 2009-03-04 23:18:27Z trygvis $
  * @plexus.component role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout" role-hint="flat"
  */
 public class FlatRepositoryLayout

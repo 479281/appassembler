@@ -21,37 +21,35 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   ~ SOFTWARE.
   -->
-  
- <daemon>
-   <mainClass>com.company.example.App</mainClass> 
-   <environmentSetupFileName>app-env</environmentSetupFileName>  
-   <generatorConfigurations>
-     <generatorConfiguration>
-       <generator>jsw</generator>
-       <configuration>       
-         <configuration.directory.in.classpath.first>etc1</configuration.directory.in.classpath.first>
-         <configuration.directory.in.classpath.last>etc2</configuration.directory.in.classpath.last>         
-         <!-- remove a built in one -->
-         <wrapper.console.format/>
-         <!-- change a built in one -->
-         <wrapper.console.loglevel>WARN</wrapper.console.loglevel>
-         <app.base.envvar>MY_BASE</app.base.envvar>        
-       </configuration>
-       <includes>
-         <include>aix-ppc-32</include>
-         <include>aix-ppc-64</include>
-         <include>hpux-parisc-64</include>
-         <include>linux-ppc-64</include>
-         <include>linux-x86-32</include>
-         <include>linux-x86-64</include>
-         <include>macosx-universal-32</include>
-         <include>macosx-universal-64</include>
-         <include>solaris-x86-32</include>
-         <include>solaris-sparc-32</include>
-         <include>solaris-sparc-64</include>
-         <include>windows-x86-32</include>
-         <include>windows-x86-64</include>
-      </includes>
-     </generatorConfiguration>
-   </generatorConfigurations>  
- </daemon>
+
+<daemon>
+  <mainClass>com.westerngeco.example.App</mainClass>
+  <jvmSettings>
+    <initialMemorySize>345</initialMemorySize>
+    <maxMemorySize>234</maxMemorySize>
+    <maxStackSize>321</maxStackSize>
+    <systemProperties>
+      <systemProperty>foo=bar</systemProperty>
+      <systemProperty>bar=foo</systemProperty>
+    </systemProperties>
+    <extraArguments>
+      <extraArgument>-splash:niceImage.png</extraArgument>
+    </extraArguments>
+  </jvmSettings>
+  <environmentSetupFileName>app-env</environmentSetupFileName>
+  <commandLineArguments>
+    <commandLineArgument>arg1=arg1-value</commandLineArgument>
+  </commandLineArguments>
+  <generatorConfigurations>
+    <generatorConfiguration>
+      <generator>jsw</generator>
+      <configuration>
+        <!-- remove a built in one -->
+        <wrapper.console.format/>
+        <!-- change a built in one -->
+        <wrapper.console.loglevel>WARN</wrapper.console.loglevel>
+        <app.base.envvar>MY_BASE</app.base.envvar>
+      </configuration>
+    </generatorConfiguration>
+  </generatorConfigurations>
+</daemon>

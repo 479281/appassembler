@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.daemon.script;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2007 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,36 +24,19 @@ package org.codehaus.mojo.appassembler.daemon.script;
  * SOFTWARE.
  */
 
-import java.io.File;
-
 import org.codehaus.mojo.appassembler.daemon.DaemonGeneratorException;
 import org.codehaus.mojo.appassembler.model.Daemon;
 
+import java.io.File;
+
 /**
  * @author <a href="mailto:trygve.laugstol@objectware.no">Trygve Laugst&oslash;l</a>
- * @version $Id: ScriptGenerator.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * @version $Id: ScriptGenerator.java 12569 2010-09-15 20:26:27Z dennisl $
  */
 public interface ScriptGenerator
 {
-    /**
-     * Define the role.
-     */
     String ROLE = ScriptGenerator.class.getName();
 
-    /**
-     * Generate the binary script based on platform, daemon into the given outputDirectory
-     * and the binFolder.
-     * 
-     * @param platform
-     *            The platform.
-     * @param daemon
-     *            The Daemon.
-     * @param outputDirectory
-     *            The output folder where the script will be generated into.
-     * @param binFolder
-     *            The bin folder which will be appended to the outputDirectory.
-     * @throws DaemonGeneratorException in case of an error.
-     */
-    void createBinScript( String platform, Daemon daemon, File outputDirectory, String binFolder )
+    void createBinScript( String platform, Daemon daemon, File outputDirectory )
         throws DaemonGeneratorException;
 }

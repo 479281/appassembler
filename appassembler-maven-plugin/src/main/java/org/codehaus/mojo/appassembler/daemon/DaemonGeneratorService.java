@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.daemon;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2007 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,21 +24,18 @@ package org.codehaus.mojo.appassembler.daemon;
  * SOFTWARE.
  */
 
-import java.io.File;
-
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.appassembler.model.Daemon;
 
+import java.io.File;
+
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: DaemonGeneratorService.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * @version $Id: DaemonGeneratorService.java 6588 2008-03-28 12:22:57Z bentmann $
  */
 public interface DaemonGeneratorService
 {
-    /**
-     * The plexus role.
-     */
     String ROLE = DaemonGeneratorService.class.getName();
 
     void generateDaemon( String platform, File stubDescriptor, File outputDirectory, MavenProject mavenProject,
@@ -59,7 +56,7 @@ public interface DaemonGeneratorService
         throws DaemonGeneratorException;
 
     /**
-     * @param daemon The daemon to validate
+     * @param daemon     The daemon to validate
      * @param descriptor An optional file reference that will be used in the exception messages.
      * @throws DaemonGeneratorException
      */

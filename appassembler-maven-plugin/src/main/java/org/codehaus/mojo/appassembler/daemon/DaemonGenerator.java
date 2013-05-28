@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.daemon;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2007 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -26,19 +26,12 @@ package org.codehaus.mojo.appassembler.daemon;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: DaemonGenerator.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * @version $Id: DaemonGenerator.java 6588 2008-03-28 12:22:57Z bentmann $
  */
 public interface DaemonGenerator
 {
-    /**
-     * The Plexus role.
-     */
     String ROLE = DaemonGenerator.class.getName();
 
-    /**
-     * @param generationRequest The request to which is used for the Daemon.
-     * @throws DaemonGeneratorException
-     */
     void generate( DaemonGenerationRequest generationRequest )
         throws DaemonGeneratorException;
 }

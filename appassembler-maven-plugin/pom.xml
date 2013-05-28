@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
   ~ The MIT License
   ~
-  ~ Copyright 2006-2012 The Codehaus.
+  ~ Copyright 2005-2007 The Codehaus.
   ~
   ~ Permission is hereby granted, free of charge, to any person obtaining a copy of
   ~ this software and associated documentation files (the "Software"), to deal in
@@ -28,36 +27,22 @@
   <parent>
     <artifactId>appassembler</artifactId>
     <groupId>org.codehaus.mojo.appassembler</groupId>
-    <version>1.3.1</version>
+    <version>1.1.1</version>
   </parent>
   <groupId>org.codehaus.mojo</groupId>
   <artifactId>appassembler-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Appassembler :: Maven Plug-In</name>
   <description>A Mojo for generating bin scripts for Java applications.</description>
-
-  <properties>
-    <its>*</its>
-    <threadCount>2</threadCount>
-    <maven.version>2.2.1</maven.version>
-  </properties>
-
   <prerequisites>
-    <maven>${maven.version}</maven>
+    <maven>2.0.6</maven>
   </prerequisites>
-
   <contributors>
-    <contributor>
-      <name>Michael Osipov</name>
-    </contributor>
     <contributor>
       <name>Philip Oliver-Paull</name>
     </contributor>
     <contributor>
       <name>Mathieu Champlon</name>
-    </contributor>
-    <contributor>
-      <name>Andreas Kohn</name>
     </contributor>
   </contributors>
   <dependencies>
@@ -67,17 +52,16 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <groupId>org.codehaus.mojo.appassembler</groupId>
+      <artifactId>appassembler-booter</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-interpolation</artifactId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.5.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -87,20 +71,22 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-project</artifactId>
-      <version>${maven.version}</version>
+      <version>2.0.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
-      <version>${maven.version}</version>
+      <version>2.0.6</version>
     </dependency>
     <dependency>
       <groupId>stax</groupId>
       <artifactId>stax-api</artifactId>
+      <version>1.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
+      <version>1.0-alpha-9-stable-1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -109,13 +95,13 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-settings</artifactId>
-      <version>${maven.version}</version>
+      <version>2.0.6</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <version>${maven.version}</version>
+      <version>2.0.6</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -124,6 +110,7 @@
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-maven-plugin</artifactId>
+        <version>1.3.8</version>
         <executions>
           <execution>
             <goals>
@@ -133,8 +120,7 @@
         </executions>
       </plugin>
       <!-- Here, we download the wrapper bundle and incorporate into the plugin directly -->
-      <!-- TODO: improve by doing this dynamically in the plugin so that non-JSW users aren't burdened by the size of the plugin, and 
-        so the user can choose an alternate version -->
+      <!-- TODO: improve by doing this dynamically in the plugin so that non-JSW users aren't burdened by the size of the plugin, and so the user can choose an alternate version -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -150,20 +136,6 @@
                   <version>3.2.3</version>
                   <type>tar.gz</type>
                 </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.jsw-binaries</groupId>
-                  <artifactId>jsw-binaries</artifactId>
-                  <version>3.2.3.6</version>
-                  <type>tar.gz</type>
-                  <outputDirectory>${project.build.directory}/dependency/sonatype-jsw-binaries</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.karaf.shell</groupId>
-                  <artifactId>org.apache.karaf.shell.wrapper</artifactId>
-                  <version>2.2.7</version>
-                  <type>jar</type>
-                  <outputDirectory>${project.build.directory}/dependency/karaf-jsw-binaries</outputDirectory>
-                </artifactItem>
               </artifactItems>
             </configuration>
             <goals>
@@ -172,40 +144,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.7</version>
-        <executions>
-          <execution>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <target>
-
-                <copy file="${project.build.directory}/dependency/sonatype-jsw-binaries/windows-x86-64/lib/wrapper.dll" tofile="${project.build.directory}/dependency/wrapper-delta-pack-3.2.3/lib/wrapper-windows-x86-64.dll" />
-                <copy file="${project.build.directory}/dependency/sonatype-jsw-binaries/windows-x86-64/wrapper.exe" tofile="${project.build.directory}/dependency/wrapper-delta-pack-3.2.3/bin/wrapper-windows-x86-64.exe" />
-
-                <copy file="${project.build.directory}/dependency/sonatype-jsw-binaries/macosx-universal-64/lib/libwrapper.jnilib" tofile="${project.build.directory}/dependency/wrapper-delta-pack-3.2.3/lib/libwrapper-macosx-universal-64.jnilib" />
-                <copy file="${project.build.directory}/dependency/sonatype-jsw-binaries/macosx-universal-64/wrapper" tofile="${project.build.directory}/dependency/wrapper-delta-pack-3.2.3/bin/wrapper-macosx-universal-64" />
-
-                <copy file="${project.build.directory}/dependency/karaf-jsw-binaries/org/apache/karaf/shell/wrapper/aix/ppc32/libwrapper.a" tofile="${project.build.directory}/dependency/wrapper-delta-pack-3.2.3/lib/libwrapper-aix-ppc-32.a" />
-                <copy file="${project.build.directory}/dependency/karaf-jsw-binaries/org/apache/karaf/shell/wrapper/aix/ppc32/karaf-wrapper" tofile="${project.build.directory}/dependency/wrapper-delta-pack-3.2.3/bin/wrapper-aix-ppc-32" />
-
-                <copy file="${project.build.directory}/dependency/karaf-jsw-binaries/org/apache/karaf/shell/wrapper/aix/ppc64/libwrapper.a" tofile="${project.build.directory}/dependency/wrapper-delta-pack-3.2.3/lib/libwrapper-aix-ppc-64.a" />
-                <copy file="${project.build.directory}/dependency/karaf-jsw-binaries/org/apache/karaf/shell/wrapper/aix/ppc64/karaf-wrapper" tofile="${project.build.directory}/dependency/wrapper-delta-pack-3.2.3/bin/wrapper-aix-ppc-64" />
-
-                <copy file="${project.build.directory}/dependency/karaf-jsw-binaries/org/apache/karaf/shell/wrapper/hpux/parisc64/libwrapper.sl" tofile="${project.build.directory}/dependency/wrapper-delta-pack-3.2.3/lib/libwrapper-hpux-parisc-64.sl" />
-                <copy file="${project.build.directory}/dependency/karaf-jsw-binaries/org/apache/karaf/shell/wrapper/hpux/parisc64/karaf-wrapper" tofile="${project.build.directory}/dependency/wrapper-delta-pack-3.2.3/bin/wrapper-hpux-parisc-64" />
-
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
     </plugins>
     <resources>
       <resource>
@@ -217,6 +155,12 @@
         <targetPath>org/codehaus/mojo/appassembler/daemon/jsw/bin</targetPath>
         <includes>
           <include>sh.script.in</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>target/dependency/wrapper-delta-pack-3.2.3/src/bin</directory>
+        <targetPath>org/codehaus/mojo/appassembler/daemon/jsw/bin</targetPath>
+        <includes>
           <include>AppCommand.bat.in</include>
         </includes>
       </resource>
@@ -243,188 +187,43 @@
       </resource>
     </resources>
   </build>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <!-- version inherited -->
-        <configuration>
-          <configLocation>config/maven_checks.xml</configLocation>
-          <headerLocation>header.txt</headerLocation>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
-
   <profiles>
     <profile>
-      <id>run-its</id>
-      <dependencies>
-        <!-- This is given as dependencies, cause some integration tests use this artifact. But i don't want to add this as an default 
-          dependencies, cause all users will download it with the appassembler-maven-plugin independent if they use it or not. -->
-        <dependency>
-          <groupId>org.codehaus.mojo.appassembler</groupId>
-          <artifactId>appassembler-booter</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-      </dependencies>
+      <id>integration-tests</id>
       <build>
         <plugins>
           <plugin>
-            <groupId>org.codehaus.gmaven</groupId>
-            <artifactId>gmaven-plugin</artifactId>
-            <version>1.5</version>
-            <dependencies>
-              <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy</artifactId>
-                <version>1.8.4</version>
-              </dependency>
-              <dependency>
-                <groupId>org.codehaus.gmaven.runtime</groupId>
-                <artifactId>gmaven-runtime-1.8</artifactId>
-                <version>1.4</version>
-              </dependency>
-            </dependencies>
-            <configuration>
-              <debug>false</debug>
-              <verbose>true</verbose>
-              <stacktrace>true</stacktrace>
-              <defaultScriptExtension>.groovy</defaultScriptExtension>
-            </configuration>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>shitty-maven-plugin</artifactId>
+            <version>1.0-alpha-3</version>
             <executions>
               <execution>
                 <goals>
-                  <goal>testCompile</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-invoker-plugin</artifactId>
-            <version>1.8</version>
-            <dependencies>
-              <dependency>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy</artifactId>
-                <version>1.8.4</version>
-              </dependency>
-              <dependency>
-                <groupId>org.codehaus.gmaven.runtime</groupId>
-                <artifactId>gmaven-runtime-1.8</artifactId>
-                <version>1.4</version>
-              </dependency>
-            </dependencies>
-            <configuration>
-              <parallelThreads>1</parallelThreads>
-              <addTestClassPath>true</addTestClassPath>
-              <debug>false</debug>
-              <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-              <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-              <projectsDirectory>src/it</projectsDirectory>
-              <showVersion>true</showVersion>
-              <pomIncludes>
-                <pomInclude>*/pom.xml</pomInclude>
-              </pomIncludes>
-              <pomExcludes>
-                <!-- Currently not correctly working. -->
-                <pomExclude>daemonWrapperManagerTest/pom.xml</pomExclude>
-                <pomExclude>daemonRepositoryLayoutTest/pom.xml</pomExclude>
-                <!-- this test, use snapshot artifact and therefore requires manual inspection -->
-                <pomExclude>useTimestampInSnapshotFileNameTest/pom.xml</pomExclude>
-              </pomExcludes>
-              <preBuildHookScript>setup</preBuildHookScript>
-              <postBuildHookScript>verify</postBuildHookScript>
-              <settingsFile>src/it/settings.xml</settingsFile>
-            </configuration>
-            <executions>
-              <execution>
-                <id>integration-tests</id>
-                <goals>
+                  <goal>clean</goal>
                   <goal>install</goal>
-                  <goal>run</goal>
+                  <goal>test</goal>
                 </goals>
-                <configuration>
-                  <goals>
-                    <goal>clean</goal>
-                    <goal>test</goal>
-                  </goals>
-                </configuration>
               </execution>
             </executions>
-          </plugin>
-        </plugins>
-      </build>
-      <reporting>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-invoker-plugin</artifactId>
-            <version>1.8</version>
-          </plugin>
-        </plugins>
-      </reporting>
-    </profile>
-
-    <profile>
-      <id>grid</id>
-      <properties>
-        <invokerPluginVersion>1.6-SNAPSHOT</invokerPluginVersion>
-        <itParallelThreads>1</itParallelThreads>
-      </properties>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>apache.snapshots</id>
-          <name>Apache Snapshots</name>
-          <url>https://repository.apache.org/content/repositories/snapshots/</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </pluginRepository>
-      </pluginRepositories>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-invoker-plugin</artifactId>
-            <version>${invokerPluginVersion}</version>
             <configuration>
-              <parallelThreads>${itParallelThreads}</parallelThreads>
+              <projects>
+                <project>
+                  <directory>src/it</directory>
+                  <includes>
+                    <include>${its}/pom.xml</include>
+                  </includes>
+                </project>
+              </projects>
+              <threadCount>${threadCount}</threadCount>
+              <parallel>true</parallel>
             </configuration>
           </plugin>
-          <plugin>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>1.0</version>
-            <executions>
-              <execution>
-                <id>mojo-enforcer-rules</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requirePluginVersions>
-                      <banSnapshots>false</banSnapshots>
-                      <!-- oups documentation sucks !! http://maven.apache.org/enforcer/enforcer-rules/requirePluginVersions.html log 
-                        says Cause: Cannot find setter nor field in org.apache.maven.plugins.enforcer.RequirePluginVersions for 'unCheckedPluginsList' <unCheckedPluginsList>org.apache.maven.plugins:maven-invoker-plugin</unCheckedPluginsList> -->
-                    </requirePluginVersions>
-                  </rules>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
         </plugins>
       </build>
     </profile>
-
   </profiles>
-
+  <properties>
+    <its>*</its>
+    <threadCount>2</threadCount>
+  </properties>
 </project>

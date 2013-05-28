@@ -1,27 +1,3 @@
-#*
- *
- * The MIT License
- *
- * Copyright 2006-2012 The Codehaus.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- *#
   ------
   Example: linux daemon using JSW 
   ------
@@ -49,11 +25,27 @@ Example: Linux daemon based on Java Service Wrapper
         <configuration>
           <repositoryLayout>flat</repositoryLayout>
           <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
-          <target>\${project.build.directory}</target>
+          <target>${project.build.directory}</target>
+
+          <defaultJvmSettings>
+            <initialMemorySize>256M</initialMemorySize>
+            <maxMemorySize>1024M</maxMemorySize>
+            <systemProperties>
+              <systemProperty>java.security.policy=conf/policy.all</systemProperty>
+              <systemProperty>com.sun.management.jmxremote</systemProperty>
+              <systemProperty>com.sun.management.jmxremote.port=8999</systemProperty>
+              <systemProperty>com.sun.management.jmxremote.authenticate=false</systemProperty>
+              <systemProperty>com.sun.management.jmxremote.ssl=false</systemProperty>
+            </systemProperties>
+            <extraArguments>
+              <extraArgument>-server</extraArgument>
+            </extraArguments>
+          </defaultJvmSettings>
+
           <daemons>
             <daemon>
               <id>app1</id>
-              <mainClass>${project.groupId}.SomeMainClass</mainClass>
+              <mainClass>${pom.groupId}.SomeMainClass</mainClass>
               <commandLineArguments>
                 <commandLineArgument>start</commandLineArgument>
               </commandLineArguments>
@@ -87,20 +79,6 @@ Example: Linux daemon based on Java Service Wrapper
                   </configuration>
                 </generatorConfiguration>
               </generatorConfigurations>
-              <jvmSettings>
-                <initialMemorySize>256M</initialMemorySize>
-                <maxMemorySize>1024M</maxMemorySize>
-                <systemProperties>
-                  <systemProperty>java.security.policy=conf/policy.all</systemProperty>
-                  <systemProperty>com.sun.management.jmxremote</systemProperty>
-                  <systemProperty>com.sun.management.jmxremote.port=8999</systemProperty>
-                  <systemProperty>com.sun.management.jmxremote.authenticate=false</systemProperty>
-                  <systemProperty>com.sun.management.jmxremote.ssl=false</systemProperty>
-                </systemProperties>
-                <extraArguments>
-                  <extraArgument>-server</extraArgument>
-                </extraArguments>
-              </jvmSettings>
             </daemon>
           </daemons>
         </configuration>
@@ -120,13 +98,14 @@ Example: Linux daemon based on Java Service Wrapper
 +--------------------------  
 
 * Comments
+  
+  The <<defaultJvmSettings>> are all properties passed to the JVM when it is started.
 
-  In the daemon configuration, the first thing to notice is the <<mainClass>> element and
+  In the daemon configuration the first thing to notice is the <<mainClass>> element and
   the <<commandLineArgument>> start. The command line argument will be passed to the main method of the given mainClass.
 
-  In the <<generatorConfiguration>>, you can specify architectures to avoid generating scripts for unrelevant platforms.
+  In the <<generatorConfiguration>> specify architectures to avoid generating scripts for unrelevant platforms.
 
-  The <<jvmSettings>> contains all the properties passed to the JVM when it is started.  
 
   The example also shows some custom properties. These properties are mostly workarounds to facilitate the
   needs of the community, and will probably be changed/refactored in later versions of the plugin.

@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.util;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2008 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,6 +24,8 @@ package org.codehaus.mojo.appassembler.util;
  * SOFTWARE.
  */
 
+import org.codehaus.plexus.util.IOUtil;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,8 +43,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.codehaus.plexus.util.IOUtil;
 
 /**
  * A class to read/write a properties file, and retain the formatting through modifications.
@@ -128,7 +128,7 @@ public class FormattedProperties
      * Read in the properties from the given stream. Note that this will be used as the basis of the next formatted
      * write, even though properties from any previous read are still retained. This allows adding properties to the top
      * of the file.
-     * 
+     *
      * @param inputStream the stream to read from
      * @throws IOException if there is a problem reading the stream
      */

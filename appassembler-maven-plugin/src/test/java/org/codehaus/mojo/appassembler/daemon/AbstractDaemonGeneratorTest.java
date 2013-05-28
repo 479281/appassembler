@@ -1,24 +1,28 @@
-/**
- * The MIT License
- * 
- * Copyright 2006-2012 The Codehaus.
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
- * associated documentation files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge, publish, distribute,
- * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
- * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
 package org.codehaus.mojo.appassembler.daemon;
+
+/*
+ * The MIT License
+ *
+ * Copyright 2005-2007 The Codehaus.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ * of the Software, and to permit persons to whom the Software is furnished to do
+ * so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,7 +50,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: AbstractDaemonGeneratorTest.java 18141 2013-04-01 10:51:16Z khmarbaise $
+ * @version $Id: AbstractDaemonGeneratorTest.java 9011 2009-02-10 14:34:30Z bentmann $
  */
 public abstract class AbstractDaemonGeneratorTest
     extends PlexusTestCase
@@ -68,7 +72,7 @@ public abstract class AbstractDaemonGeneratorTest
 
         MavenSettingsBuilder settingsBuilder = (MavenSettingsBuilder) lookup( MavenSettingsBuilder.ROLE );
         Settings settings = settingsBuilder.buildSettings();
-
+        
         ArtifactRepositoryFactory artifactRepositoryFactory =
             (ArtifactRepositoryFactory) lookup( ArtifactRepositoryFactory.ROLE );
 
@@ -99,7 +103,7 @@ public abstract class AbstractDaemonGeneratorTest
 
         Daemon model = daemonGeneratorService.loadModel( getTestFile( descriptor ) );
 
-        generator.generate( new DaemonGenerationRequest( model, project, localRepository, outputDir, "bin" ) );
+        generator.generate( new DaemonGenerationRequest( model, project, localRepository, outputDir ) );
     }
 
     protected File createFilteredFile( String file )

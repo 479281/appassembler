@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2008 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,11 +24,6 @@ package org.codehaus.mojo.appassembler;
  * SOFTWARE.
  */
 
-/**
- * The class which is used to contain the JVM settings.
- * 
- * @author <a href="mailto:codehaus@soebes.de">Karl Heinz Marbaise</a>
- */
 public class JvmSettings
 {
     private String initialMemorySize;
@@ -41,51 +36,26 @@ public class JvmSettings
 
     private String[] extraArguments;
 
-    /**
-     * The initial memory size.
-     * 
-     * @return value as string.
-     */
     public String getInitialMemorySize()
     {
         return initialMemorySize;
     }
 
-    /**
-     * The maximum memory size.
-     * 
-     * @return The max memory size.
-     */
     public String getMaxMemorySize()
     {
         return maxMemorySize;
     }
 
-    /**
-     * Max Stack Size.
-     * 
-     * @return The max stack size.
-     */
     public String getMaxStackSize()
     {
         return maxStackSize;
     }
 
-    /**
-     * The system properties.
-     * 
-     * @return The array with with the system properties.
-     */
     public String[] getSystemProperties()
     {
         return systemProperties;
     }
 
-    /**
-     * Extra arguments.
-     * 
-     * @return The array with the extra arguments.
-     */
     public String[] getExtraArguments()
     {
         return extraArguments;

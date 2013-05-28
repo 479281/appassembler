@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.daemon;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2007 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,13 +24,6 @@ package org.codehaus.mojo.appassembler.daemon;
  * SOFTWARE.
  */
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Map;
-
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.appassembler.daemon.merge.DaemonMerger;
@@ -40,9 +33,15 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Map;
+
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: DefaultDaemonGeneratorService.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * @version $Id: DefaultDaemonGeneratorService.java 6952 2008-05-12 07:26:23Z brett $
  * @plexus.component
  */
 public class DefaultDaemonGeneratorService
@@ -167,13 +166,13 @@ public class DefaultDaemonGeneratorService
         }
         catch ( IOException e )
         {
-            throw new DaemonGeneratorException( "Error while loading daemon descriptor from '"
-                + stubDescriptor.getAbsolutePath() + "'.", e );
+            throw new DaemonGeneratorException(
+                "Error while loading daemon descriptor from '" + stubDescriptor.getAbsolutePath() + "'.", e );
         }
         catch ( XMLStreamException e )
         {
-            throw new DaemonGeneratorException( "Error while loading daemon descriptor from '"
-                + stubDescriptor.getAbsolutePath() + "'.", e );
+            throw new DaemonGeneratorException(
+                "Error while loading daemon descriptor from '" + stubDescriptor.getAbsolutePath() + "'.", e );
         }
         finally
         {

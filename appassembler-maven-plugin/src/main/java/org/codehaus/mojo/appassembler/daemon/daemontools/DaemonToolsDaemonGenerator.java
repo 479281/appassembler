@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.daemon.daemontools;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2008 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,6 +24,15 @@ package org.codehaus.mojo.appassembler.daemon.daemontools;
  * SOFTWARE.
  */
 
+import org.codehaus.mojo.appassembler.daemon.DaemonGenerationRequest;
+import org.codehaus.mojo.appassembler.daemon.DaemonGenerator;
+import org.codehaus.mojo.appassembler.daemon.DaemonGeneratorException;
+import org.codehaus.mojo.appassembler.model.Daemon;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.InterpolationFilterReader;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -33,15 +42,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.codehaus.mojo.appassembler.daemon.DaemonGenerationRequest;
-import org.codehaus.mojo.appassembler.daemon.DaemonGenerator;
-import org.codehaus.mojo.appassembler.daemon.DaemonGeneratorException;
-import org.codehaus.mojo.appassembler.model.Daemon;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.InterpolationFilterReader;
 
 /**
  * @author Andrew Williams
@@ -56,9 +56,6 @@ public class DaemonToolsDaemonGenerator
     // DaemonGenerator Implementation
     // -----------------------------------------------------------------------
 
-    /* (non-Javadoc)
-     * @see org.codehaus.mojo.appassembler.daemon.DaemonGenerator#generate(org.codehaus.mojo.appassembler.daemon.DaemonGenerationRequest)
-     */
     public void generate( DaemonGenerationRequest request )
         throws DaemonGeneratorException
     {
@@ -102,7 +99,8 @@ public class DaemonToolsDaemonGenerator
         context.put( "MAINCLASS", daemon.getMainClass() );
         context.put( "NAME", daemon.getId() );
 
-        InterpolationFilterReader interpolationFilterReader = new InterpolationFilterReader( reader, context, "@", "@" );
+        InterpolationFilterReader interpolationFilterReader = new InterpolationFilterReader( reader, context,
+                                                                                             "@", "@" );
 
         File runFile = new File( request.getOutputDirectory(), "run" );
         FileWriter out = null;

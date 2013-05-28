@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2007 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,17 +24,9 @@ package org.codehaus.mojo.appassembler;
  * SOFTWARE.
  */
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
@@ -43,34 +35,32 @@ import org.codehaus.mojo.appassembler.daemon.DaemonGeneratorException;
 import org.codehaus.mojo.appassembler.daemon.DaemonGeneratorService;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Generates JSW based daemon wrappers.
  * 
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: GenerateDaemonsMojo.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * @version $Id: GenerateDaemonsMojo.java 13058 2010-11-08 20:38:56Z dennisl $
  * @goal generate-daemons
  * @requiresDependencyResolution runtime
  * @phase package
- * @threadSafe
  */
 public class GenerateDaemonsMojo
-    extends AbstractAppAssemblerMojo
+    extends AbstractMojo
 {
     // -----------------------------------------------------------------------
     // Parameters
     // -----------------------------------------------------------------------
 
     /**
-     * The base directory of the project.
-     * 
-     * @parameter expression="${basedir}"
-     * @required
-     */
-    private File basedir;
-
-    /**
      * Set of {@linkplain Daemon}s to generate.
-     * 
      * @parameter
      * @required
      */
@@ -78,75 +68,39 @@ public class GenerateDaemonsMojo
 
     /**
      * {@linkplain JvmSettings} describing min/max memory and stack size, system properties and extra arguments.
-     * 
      * @parameter
      */
     private JvmSettings defaultJvmSettings;
 
     /**
-     * Setup file in $BASEDIR/bin to be called prior to execution. If this optional environment file also sets up
-     * WRAPPER_CONF_OVERRIDES variable, it will be passed into JSW native launcher's command line arguments to override
-     * wrapper.conf's properties. See http://wrapper.tanukisoftware.com/doc/english/props-command-line.html for details.
-     * 
-     * @parameter
-     * @since 1.2.3
+     * The base directory of the project.
+     * @parameter expression="${basedir}"
+     * @required
      */
-    private String environmentSetupFileName;
-
-    /**
-     * You can define a license header file which will be used instead the default header in the generated scripts.
-     * 
-     * @parameter
-     * @since 1.2
-     */
-    private File licenseHeaderFile;
+    private File basedir;
 
     /**
      * Target directory for generated daemons.
-     * 
      * @parameter expression="${project.build.directory}/generated-resources/appassembler"
      * @required
      */
     private File target;
 
     /**
-     * The unix template of the generated script. It can be a file or resource path. If not given, an internal one is
-     * used. Use with care since it not guaranteed to be compatible with future plugin releases.
-     * 
-     * @since 1.3
-     * @parameter expression="${unixScriptTemplate}"
+     * The maven project in question.
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
      */
-    private String unixScriptTemplate;
+    private MavenProject project;
 
     /**
-     * When enable, name wrapper configuration file as wrapper-${daemon.id}.conf
-     * 
-     * @parameter default-value="false"
-     * @since 1.3
+     * The layout of the generated Maven repository. Supported types - "default" (Maven2) | "legacy" (Maven1) | "flat"
+     * (flat <code>lib/</code> style).
+     *
+     * @parameter default-value="default"
      */
-    private boolean useDaemonIdAsWrapperConfName;
-
-    /**
-     * Sometimes it happens that you have many dependencies which means in other words having a very long classpath. And
-     * sometimes the classpath becomes too long (in particular on Windows based platforms). This option can help in such
-     * situation. If you activate that your classpath contains only a <a href=
-     * "http://docs.oracle.com/javase/6/docs/technotes/tools/windows/classpath.html" >classpath wildcard</a> (REPO/*).
-     * But be aware that this works only in combination with Java 1.6 and above and with {@link #repositoryLayout}
-     * <code>flat</code>. Otherwise this configuration will not work.
-     * 
-     * @since 1.3.1
-     * @parameter default-value="false"
-     */
-    private boolean useWildcardClassPath;
-
-    /**
-     * The windows template of the generated script. It can be a file or resource path. If not given, an internal one is
-     * used. Use with care since it is not guaranteed to be compatible with future plugin releases.
-     * 
-     * @since 1.3
-     * @parameter expression="${windowsScriptTemplate}"
-     */
-    private String windowsScriptTemplate;
+    private String repositoryLayout;
 
     // -----------------------------------------------------------------------
     // Read-only parameters
@@ -154,54 +108,34 @@ public class GenerateDaemonsMojo
 
     /**
      * @readonly
-     * @parameter expression="${project.runtimeArtifacts}"
+     * @parameter expression="${localRepository}"
      */
-    private List artifacts;
-
-    /**
-     * The maven project in question.
-     * 
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    private MavenProject project;
+    private ArtifactRepository localRepository;
 
     // -----------------------------------------------------------------------
     // Components
     // -----------------------------------------------------------------------
 
     /**
-     * @component role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout"
-     */
-    private Map availableRepositoryLayouts;
-
-    /**
      * @component
      */
     private DaemonGeneratorService daemonGeneratorService;
+
+    /**
+     * @component role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout"
+     */
+    private Map availableRepositoryLayouts;
 
     // -----------------------------------------------------------------------
     // AbstractMojo Implementation
     // -----------------------------------------------------------------------
 
-    /**
-     * calling from Maven.
-     * @see org.apache.maven.plugin.AbstractMojo#execute()
-     */
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-
-        if ( isUseWildcardClassPath() && !repositoryLayout.equalsIgnoreCase( "flat" ) )
+        for ( Iterator it = daemons.iterator(); it.hasNext(); )
         {
-            throw new MojoExecutionException( "The useWildcardClassPath works only in"
-                + " combination with repositoryLayout flat." );
-        }
-
-        for ( Iterator itd = daemons.iterator(); itd.hasNext(); )
-        {
-            Daemon daemon = (Daemon) itd.next();
+            Daemon daemon = (Daemon) it.next();
 
             // -----------------------------------------------------------------------
             // Load the optional template daemon descriptor
@@ -239,32 +173,6 @@ public class GenerateDaemonsMojo
             org.codehaus.mojo.appassembler.model.Daemon modelDaemon = convertDaemon( daemon, modelJvmSettings );
 
             // -----------------------------------------------------------------------
-            // Default Handling for license file
-            // -----------------------------------------------------------------------
-            if ( this.licenseHeaderFile != null )
-            {
-                // Allow overwrite if not set otherwise the set license header file will be used.
-                if ( modelDaemon.getLicenseHeaderFile() == null )
-                {
-                    modelDaemon.setLicenseHeaderFile( this.licenseHeaderFile.toString() );
-                }
-            }
-
-            modelDaemon.setEnvironmentSetupFileName( environmentSetupFileName );
-            modelDaemon.setUseTimestampInSnapshotFileName( useTimestampInSnapshotFileName );
-            modelDaemon.setUseDaemonIdAsWrapperConfName( useDaemonIdAsWrapperConfName );
-            modelDaemon.setUseWildcardClassPath( useWildcardClassPath );
-
-            if ( this.unixScriptTemplate != null )
-            {
-                modelDaemon.setUnixScriptTemplate( unixScriptTemplate );
-            }
-            if ( this.windowsScriptTemplate != null )
-            {
-                modelDaemon.setWindowsScriptTemplate( windowsScriptTemplate );
-            }
-
-            // -----------------------------------------------------------------------
             //
             // -----------------------------------------------------------------------
 
@@ -276,8 +184,7 @@ public class GenerateDaemonsMojo
 
                 DaemonGenerationRequest request = new DaemonGenerationRequest();
 
-                // TODO: split platform from generator (platform = operating systems, generator = jsw, booter,
-                // standard). Generator is a property of the daemon itself
+                // TODO: split platform from generator (platform = operating systems, generator = jsw, booter, standard). Generator is a property of the daemon itself
                 request.setPlatform( platform );
                 request.setStubDescriptor( descriptor );
                 request.setStubDaemon( modelDaemon );
@@ -294,29 +201,7 @@ public class GenerateDaemonsMojo
                 {
                     throw new MojoExecutionException( "Error while generating daemon.", e );
                 }
-
-                File outputDirectory = new File( request.getOutputDirectory(), daemon.getId() );
-
-                // The repo where the jar files will be installed
-                // FIXME: /lib hard coded. Should be made configurable.
-                // via repositoryName like in AssembleMojo ?
-                // Might be refactored into AbstractAppAssemblerMojo?
-                ArtifactRepository artifactRepository =
-                    artifactRepositoryFactory.createDeploymentArtifactRepository( "appassembler", "file://"
-                        + outputDirectory.getAbsolutePath() + "/lib", artifactRepositoryLayout, false );
-
-                for ( Iterator it = artifacts.iterator(); it.hasNext(); )
-                {
-                    Artifact artifact = (Artifact) it.next();
-
-                    installArtifact( artifact, artifactRepository, this.useTimestampInSnapshotFileName );
-                }
-
-                // install the project's artifact in the new repository
-                installArtifact( projectArtifact, artifactRepository );
-
             }
-
         }
     }
 
@@ -345,7 +230,8 @@ public class GenerateDaemonsMojo
 
         if ( daemon.getGeneratorConfigurations() != null )
         {
-            modelDaemon.setGeneratorConfigurations( convertGeneratorConfigurations( daemon.getGeneratorConfigurations() ) );
+            modelDaemon.setGeneratorConfigurations(
+                convertGeneratorConfigurations( daemon.getGeneratorConfigurations() ) );
         }
 
         return modelDaemon;
@@ -363,14 +249,15 @@ public class GenerateDaemonsMojo
         return value;
     }
 
-    private org.codehaus.mojo.appassembler.model.GeneratorConfiguration convertGeneratorConfiguration( GeneratorConfiguration config )
+    private org.codehaus.mojo.appassembler.model.GeneratorConfiguration convertGeneratorConfiguration(
+        GeneratorConfiguration config )
     {
         org.codehaus.mojo.appassembler.model.GeneratorConfiguration value =
             new org.codehaus.mojo.appassembler.model.GeneratorConfiguration();
         value.setGenerator( config.getGenerator() );
         value.setConfiguration( config.getConfiguration() );
         value.setIncludes( config.getIncludes() );
-
+        
         return value;
     }
 
@@ -408,34 +295,8 @@ public class GenerateDaemonsMojo
         this.availableRepositoryLayouts = availableRepositoryLayouts;
     }
 
-    /**
-     * Seth the daemon.
-     * 
-     * @param daemons
-     */
     public void setDaemons( Set daemons )
     {
         this.daemons = daemons;
     }
-
-    /**
-     * Should the <code>/*</code> part for the classpath be used or not.
-     * 
-     * @return true if the wild card class path will be used false otherwise.
-     */
-    public boolean isUseWildcardClassPath()
-    {
-        return useWildcardClassPath;
-    }
-
-    /**
-     * Use wildcard classpath or not.
-     * 
-     * @param useWildcardClassPath true to use wildcard classpath false otherwise.
-     */
-    public void setUseWildcardClassPath( boolean useWildcardClassPath )
-    {
-        this.useWildcardClassPath = useWildcardClassPath;
-    }
-
 }

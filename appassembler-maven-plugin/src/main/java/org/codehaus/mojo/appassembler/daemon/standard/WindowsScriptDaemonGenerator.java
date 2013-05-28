@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.daemon.standard;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2008 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -31,7 +31,7 @@ import org.codehaus.mojo.appassembler.daemon.script.Platform;
 
 /**
  * Generates unix and/or windows wrapperscripts.
- * 
+ *
  * @plexus.component role-hint="windows"
  */
 public class WindowsScriptDaemonGenerator
@@ -46,6 +46,6 @@ public class WindowsScriptDaemonGenerator
         throws DaemonGeneratorException
     {
         scriptGenerator.createBinScript( getPlatformName(), generationRequest.getDaemon(),
-                                         generationRequest.getOutputDirectory(), generationRequest.getBinFolder() );
+                                         generationRequest.getOutputDirectory() );
     }
 }

@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.daemon.jsw;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2007 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -25,8 +25,6 @@ package org.codehaus.mojo.appassembler.daemon.jsw;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -46,10 +44,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.appassembler.daemon.DaemonGenerationRequest;
 import org.codehaus.mojo.appassembler.daemon.DaemonGenerator;
 import org.codehaus.mojo.appassembler.daemon.DaemonGeneratorException;
-import org.codehaus.mojo.appassembler.model.Daemon;
-import org.codehaus.mojo.appassembler.model.Dependency;
-import org.codehaus.mojo.appassembler.model.GeneratorConfiguration;
-import org.codehaus.mojo.appassembler.util.ArtifactUtils;
+import org.codehaus.mojo.appassembler.model.*;
 import org.codehaus.mojo.appassembler.util.FormattedProperties;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
@@ -60,22 +55,15 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: JavaServiceWrapperDaemonGenerator.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * @version $Id: JavaServiceWrapperDaemonGenerator.java 12569 2010-09-15 20:26:27Z dennisl $
  * @plexus.component role-hint="jsw"
  */
 public class JavaServiceWrapperDaemonGenerator
     extends AbstractLogEnabled
     implements DaemonGenerator
 {
-    private static final Map JSW_PLATFORMS_MAP = new HashMap()
-    {
-        {
-            put( "aix-ppc-32-lib", "lib/libwrapper-aix-ppc-32.a" );
-            put( "aix-ppc-32-exec", "bin/wrapper-aix-ppc-32" );
-            put( "aix-ppc-64-lib", "lib/libwrapper-aix-ppc-64.a" );
-            put( "aix-ppc-64-exec", "bin/wrapper-aix-ppc-64" );
-            put( "hpux-parisc-64-lib", "lib/libwrapper-hpux-parisc-64.sl" );
-            put( "hpux-parisc-64-exec", "bin/wrapper-hpux-parisc-64" );
+    private static final Map jswPlatformsMap = new HashMap() { 
+        {   
             put( "linux-x86-32-lib", "lib/libwrapper-linux-x86-32.so" );
             put( "linux-x86-32-exec", "bin/wrapper-linux-x86-32" );
             put( "linux-x86-64-lib", "lib/libwrapper-linux-x86-64.so" );
@@ -86,10 +74,6 @@ public class JavaServiceWrapperDaemonGenerator
             put( "macosx-ppc-32-exec", "bin/wrapper-macosx-ppc-32" );
             put( "macosx-x86-universal-32-lib", "lib/libwrapper-macosx-universal-32.jnilib" );
             put( "macosx-x86-universal-32-exec", "bin/wrapper-macosx-universal-32" );
-            put( "macosx-universal-32-lib", "lib/libwrapper-macosx-universal-32.jnilib" );
-            put( "macosx-universal-32-exec", "bin/wrapper-macosx-universal-32" );
-            put( "macosx-universal-64-lib", "lib/libwrapper-macosx-universal-64.jnilib" );
-            put( "macosx-universal-64-exec", "bin/wrapper-macosx-universal-64" );
             put( "solaris-sparc-32-lib", "lib/libwrapper-solaris-sparc-32.so" );
             put( "solaris-sparc-32-exec", "bin/wrapper-solaris-sparc-32" );
             put( "solaris-sparc-64-lib", "lib/libwrapper-solaris-sparc-64.so" );
@@ -98,15 +82,13 @@ public class JavaServiceWrapperDaemonGenerator
             put( "solaris-x86-32-exec", "bin/wrapper-solaris-x86-32" );
             put( "windows-x86-32-lib", "lib/wrapper-windows-x86-32.dll" );
             put( "windows-x86-32-exec", "bin/wrapper-windows-x86-32.exe" );
-            put( "windows-x86-64-lib", "lib/wrapper-windows-x86-64.dll" );
-            put( "windows-x86-64-exec", "bin/wrapper-windows-x86-64.exe" );
         }
     };
-
+    
     // -----------------------------------------------------------------------
     // DaemonGenerator Implementation
     // -----------------------------------------------------------------------
-
+    
     public void generate( DaemonGenerationRequest request )
         throws DaemonGeneratorException
     {
@@ -125,20 +107,17 @@ public class JavaServiceWrapperDaemonGenerator
             runAsUserEnvVar = "RUN_AS_USER=" + runAsUserEnvVar;
             configuration.remove( "run.as.user.envvar" );
         }
-        String pidFile = configuration.getProperty( "wrapper.pidfile", "$BASEDIR/logs" );
 
         Properties context = createContext( request, daemon );
         context.setProperty( "app.base.envvar", appBaseEnvVar );
-        context.setProperty( "wrapper.pidfile", pidFile );
         context.setProperty( "run.as.user.envvar", runAsUserEnvVar );
-        context.setProperty( "wrapper.conf.fileName", this.getWrapperConfigFileName( daemon ) );
 
         writeWrapperConfFile( request, daemon, outputDirectory, context, configuration );
 
         writeScriptFiles( request, daemon, outputDirectory, context );
-
-        List jswPlatformIncludes = getJswPlatformIncludes( daemon );
-
+                
+        List jswPlatformIncludes = getJswPlatformIncludes( daemon );        
+        
         writeLibraryFiles( outputDirectory, jswPlatformIncludes );
 
         writeExecutableFiles( outputDirectory, jswPlatformIncludes );
@@ -174,18 +153,9 @@ public class JavaServiceWrapperDaemonGenerator
         confFile.setPropertyAfter( "wrapper.working.dir", "..", "wrapper.java.command" );
         confFile.setProperty( "wrapper.java.library.path.1", "lib" );
 
-        confFile.setPropertyAfter( "set.default.REPO_DIR", "lib", "wrapper.java.mainclass" );
-        confFile.setPropertyAfter( "set." + context.getProperty( "app.base.envvar" ), ".", "wrapper.java.mainclass" );
-
-        if ( daemon.getWrapperLogFile() == null )
-        {
-            // Write the default value to the wrapper.logfile.
-            confFile.setProperty( "wrapper.logfile", "../logs/wrapper.log" );
-        }
-        else
-        {
-            confFile.setProperty( "wrapper.logfile", daemon.getWrapperLogFile() );
-        }
+        confFile.setPropertyAfter( "set.default.REPO_DIR", "repo", "wrapper.java.mainclass" );
+        confFile.setPropertyAfter( "set.default." + context.getProperty( "app.base.envvar" ), ".",
+                                   "wrapper.java.mainclass" );
 
         if ( daemon.getJvmSettings() != null && !StringUtils.isEmpty( daemon.getJvmSettings().getInitialMemorySize() ) )
         {
@@ -197,9 +167,9 @@ public class JavaServiceWrapperDaemonGenerator
             confFile.setProperty( "wrapper.java.maxmemory", daemon.getJvmSettings().getMaxMemorySize() );
         }
 
-        confFile.setProperty( "wrapper.app.parameter.1", daemon.getMainClass() );
+        confFile.setProperty( "wrapper.app.parameter.1", daemon.getMainClass() );        
 
-        createClasspath( daemon, request, confFile, configuration );
+        createClasspath( request, confFile, configuration );
         createAdditional( daemon, confFile );
         createParameters( daemon, confFile );
 
@@ -224,25 +194,13 @@ public class JavaServiceWrapperDaemonGenerator
 
         Reader reader = new InputStreamReader( new StringInputStream( string.toString() ) );
 
-        writeFilteredFile( request, daemon, reader, new File( outputDirectory, "conf/"
-            + getWrapperConfigFileName( daemon ) ), context );
-    }
-
-    private String getWrapperConfigFileName( Daemon daemon )
-    {
-        String wrapperConfigFileName = "wrapper.conf";
-        if ( daemon.isUseDaemonIdAsWrapperConfName() )
-        {
-            wrapperConfigFileName = "wrapper-" + daemon.getId() + ".conf";
-        }
-
-        return wrapperConfigFileName;
+        writeFilteredFile( request, daemon, reader, new File( outputDirectory, "conf/wrapper.conf" ), context );
     }
 
     private Properties createConfiguration( Daemon daemon )
     {
         Properties configuration = new Properties();
-
+        
         for ( Iterator i = daemon.getGeneratorConfigurations().iterator(); i.hasNext(); )
         {
             GeneratorConfiguration generatorConfiguration = (GeneratorConfiguration) i.next();
@@ -259,7 +217,8 @@ public class JavaServiceWrapperDaemonGenerator
                                            File outputFile, Map context )
         throws DaemonGeneratorException
     {
-        InterpolationFilterReader interpolationFilterReader = new InterpolationFilterReader( reader, context, "@", "@" );
+        InterpolationFilterReader interpolationFilterReader =
+            new InterpolationFilterReader( reader, context, "@", "@" );
 
         writeFile( outputFile, interpolationFilterReader );
     }
@@ -275,26 +234,6 @@ public class JavaServiceWrapperDaemonGenerator
             description = request.getMavenProject().getName();
         }
         context.setProperty( "app.description", description );
-
-        String envSetupFileName = daemon.getEnvironmentSetupFileName();
-
-        String envSetup = "";
-        if ( envSetupFileName != null )
-        {
-            String envScriptPath = "\"%BASEDIR%\\bin\\" + envSetupFileName + ".bat\"";
-            envSetup = "if exist " + envScriptPath + " call " + envScriptPath;
-            context.put( "env.setup.windows", envSetup );
-
-            envScriptPath = "\"$BASEDIR\"/bin/" + envSetupFileName;
-            envSetup = "[ -f " + envScriptPath + " ] && . " + envScriptPath;
-            context.put( "env.setup.unix", envSetup );
-        }
-        else
-        {
-            context.put( "env.setup.windows", envSetup );
-            context.put( "env.setup.unix", envSetup );
-        }
-
         return context;
     }
 
@@ -334,7 +273,7 @@ public class JavaServiceWrapperDaemonGenerator
             IOUtil.copy( inputStream, out );
         }
         catch ( IOException e )
-        {
+        {            
             throw new DaemonGeneratorException( "Error writing output file: " + outputFile.getAbsolutePath(), e );
         }
         finally
@@ -344,8 +283,8 @@ public class JavaServiceWrapperDaemonGenerator
         }
     }
 
-    private void createClasspath( Daemon daemon, DaemonGenerationRequest request, FormattedProperties confFile,
-                                  Properties configuration )
+    private static void createClasspath( DaemonGenerationRequest request, FormattedProperties confFile,
+                                         Properties configuration )
     {
         final String wrapperClassPathPrefix = "wrapper.java.classpath.";
 
@@ -361,27 +300,17 @@ public class JavaServiceWrapperDaemonGenerator
         MavenProject project = request.getMavenProject();
         ArtifactRepositoryLayout layout = request.getRepositoryLayout();
 
-        if ( daemon.isUseWildcardClassPath() )
-        {
-            confFile.setProperty( wrapperClassPathPrefix + counter++, "%REPO_DIR%/*" );
-        }
-        else
-        {
-            confFile.setProperty( wrapperClassPathPrefix + counter++,
-                                  "%REPO_DIR%/"
-                                      + createDependency( layout, project.getArtifact(), true ).getRelativePath() );
+        confFile.setProperty( wrapperClassPathPrefix + counter++, "%REPO_DIR%/"
+            + createDependency( layout, project.getArtifact() ).getRelativePath() );
 
-            Iterator j = project.getRuntimeArtifacts().iterator();
-            while ( j.hasNext() )
-            {
-                Artifact artifact = (Artifact) j.next();
+        Iterator j = project.getRuntimeArtifacts().iterator();
+        while ( j.hasNext() )
+        {
+            Artifact artifact = (Artifact) j.next();
 
-                confFile.setProperty( wrapperClassPathPrefix + counter,
-                                      "%REPO_DIR%/"
-                                          + createDependency( layout, artifact,
-                                                              daemon.isUseTimestampInSnapshotFileName() ).getRelativePath() );
-                counter++;
-            }
+            confFile.setProperty( wrapperClassPathPrefix + counter, "%REPO_DIR%/"
+                + createDependency( layout, artifact ).getRelativePath() );
+            counter++;
         }
 
         String configurationDirLast = configuration.getProperty( "configuration.directory.in.classpath.last" );
@@ -391,19 +320,13 @@ public class JavaServiceWrapperDaemonGenerator
         }
     }
 
-    private Dependency createDependency( ArtifactRepositoryLayout layout, Artifact artifact,
-                                         boolean useTimestampInSnapshotFileName )
+    private static Dependency createDependency( ArtifactRepositoryLayout layout, Artifact artifact )
     {
         Dependency dependency = new Dependency();
         dependency.setArtifactId( artifact.getArtifactId() );
         dependency.setGroupId( artifact.getGroupId() );
         dependency.setVersion( artifact.getVersion() );
         dependency.setRelativePath( layout.pathOf( artifact ) );
-        if ( artifact.isSnapshot() && !useTimestampInSnapshotFileName )
-        {
-            dependency.setRelativePath( ArtifactUtils.pathBaseVersionOf( layout, artifact ) );
-        }
-
         return dependency;
     }
 
@@ -440,96 +363,28 @@ public class JavaServiceWrapperDaemonGenerator
                                    Properties context )
         throws DaemonGeneratorException
     {
-        InputStream shellScriptInputStream = null;
-        InputStream batchFileInputStream = null;
-        try
+        // TODO: selectively depending on selected platforms instead of always doing both
+        InputStream shellScriptInputStream = this.getClass().getResourceAsStream( "bin/sh.script.in" );
+
+        if ( shellScriptInputStream == null )
         {
-            // TODO: selectively depending on selected platforms instead of always doing both
-            shellScriptInputStream = getUnixTemplate( daemon );
-
-            if ( shellScriptInputStream == null )
-            {
-                throw new DaemonGeneratorException( "Could not load template." );
-            }
-
-            Reader reader = new InputStreamReader( shellScriptInputStream );
-
-            writeFilteredFile( request, daemon, reader, new File( outputDirectory, "bin/" + daemon.getId() ), context );
-
-            batchFileInputStream = this.getWindowsTemplate( daemon );
-
-            if ( batchFileInputStream == null )
-            {
-                throw new DaemonGeneratorException( "Could not load template." );
-            }
-
-            reader = new InputStreamReader( batchFileInputStream );
-
-            writeFilteredFile( request, daemon, reader, new File( outputDirectory, "bin/" + daemon.getId() + ".bat" ),
-                               context );
-        }
-        finally
-        {
-            IOUtil.close( shellScriptInputStream );
-            IOUtil.close( batchFileInputStream );
-        }
-    }
-
-    private InputStream getUnixTemplate( Daemon daemon )
-        throws DaemonGeneratorException
-    {
-        return getTemplate( daemon.getUnixScriptTemplate(), "bin/sh.script.in" );
-    }
-
-    private InputStream getWindowsTemplate( Daemon daemon )
-        throws DaemonGeneratorException
-    {
-        return getTemplate( daemon.getWindowsScriptTemplate(), "bin/AppCommand.bat.in" );
-    }
-
-    private InputStream getTemplate( String customTemplate, String internalTemplate )
-        throws DaemonGeneratorException
-    {
-
-        InputStream is = null;
-
-        try
-        {
-            if ( customTemplate != null )
-            {
-                File customTemplateFile = new File( customTemplate );
-                if ( customTemplateFile.exists() )
-                {
-                    is = new FileInputStream( customTemplateFile );
-                }
-                else
-                {
-                    is = getClass().getClassLoader().getResourceAsStream( customTemplate );
-                    if ( is == null )
-                    {
-                        throw new DaemonGeneratorException( "Unable to load external template resource: "
-                            + customTemplate );
-                    }
-
-                }
-            }
-            else
-            {
-                is = this.getClass().getResourceAsStream( internalTemplate );
-                if ( is == null )
-                {
-                    throw new DaemonGeneratorException( "Unable to load internal template resource: "
-                        + internalTemplate );
-                }
-            }
-
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new DaemonGeneratorException( "Unable to load external template file", e );
+            throw new DaemonGeneratorException( "Could not load template." );
         }
 
-        return is;
+        Reader reader = new InputStreamReader( shellScriptInputStream );
+
+        writeFilteredFile( request, daemon, reader, new File( outputDirectory, "bin/" + daemon.getId() ), context );
+
+        // AppCommand.bat is not filtered
+        InputStream batchFileInputStream = this.getClass().getResourceAsStream( "bin/AppCommand.bat.in" );
+
+        if ( batchFileInputStream == null )
+        {
+            throw new DaemonGeneratorException( "Could not load template." );
+        }
+
+        writeFile( new File( outputDirectory, "bin/" + daemon.getId() + ".bat" ),
+                   batchFileInputStream );
     }
 
     private void writeLibraryFiles( File outputDirectory, List jswPlatformIncludes )
@@ -540,7 +395,7 @@ public class JavaServiceWrapperDaemonGenerator
         for ( Iterator iter = jswPlatformIncludes.iterator(); iter.hasNext(); )
         {
             String platform = (String) iter.next();
-            String libFile = (String) JSW_PLATFORMS_MAP.get( platform + "-lib" );
+            String libFile = (String) jswPlatformsMap.get( platform + "-lib" );
             if ( libFile != null )
             {
                 copyResourceFile( outputDirectory, libFile );
@@ -558,7 +413,7 @@ public class JavaServiceWrapperDaemonGenerator
         for ( Iterator iter = jswPlatformIncludes.iterator(); iter.hasNext(); )
         {
             String platform = (String) iter.next();
-            String execFile = (String) JSW_PLATFORMS_MAP.get( platform + "-exec" );
+            String execFile = (String) jswPlatformsMap.get( platform + "-exec" );
             if ( execFile != null )
             {
                 copyResourceFile( outputDirectory, execFile );
@@ -582,7 +437,7 @@ public class JavaServiceWrapperDaemonGenerator
 
         writeFile( new File( outputDirectory, fileName ), batchFileInputStream );
     }
-
+    
     private List getJswPlatformIncludes( Daemon daemon )
     {
         List jswPlatformIncludes = null;
@@ -600,8 +455,6 @@ public class JavaServiceWrapperDaemonGenerator
         if ( jswPlatformIncludes == null || jswPlatformIncludes.isEmpty() )
         {
             jswPlatformIncludes = new ArrayList();
-            jswPlatformIncludes.add( "aix-ppc-32" );
-            jswPlatformIncludes.add( "aix-ppc-64" );
             jswPlatformIncludes.add( "linux-x86-32" );
             jswPlatformIncludes.add( "macosx-x86-universal-32" );
             jswPlatformIncludes.add( "solaris-x86-32" );

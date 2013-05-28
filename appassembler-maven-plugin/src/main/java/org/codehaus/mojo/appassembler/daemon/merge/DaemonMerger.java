@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.daemon.merge;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2007 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -29,22 +29,12 @@ import org.codehaus.mojo.appassembler.model.Daemon;
 
 /**
  * @author <a href="mailto:trygve.laugstol@objectware.no">Trygve Laugst&oslash;l</a>
- * @version $Id: DaemonMerger.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * @version $Id: DaemonMerger.java 6588 2008-03-28 12:22:57Z bentmann $
  */
 public interface DaemonMerger
 {
-    /**
-     * The role of the merger.
-     */
     String ROLE = DaemonMerger.class.getName();
 
-    /**
-     * Merge two Daemons into a single one.
-     * @param dominant
-     * @param recessive
-     * @return The merged Daemon instance.
-     * @throws DaemonGeneratorException
-     */
     Daemon mergeDaemons( Daemon dominant, Daemon recessive )
         throws DaemonGeneratorException;
 }

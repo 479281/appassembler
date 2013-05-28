@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler.daemon.generic;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2007 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,14 +24,6 @@ package org.codehaus.mojo.appassembler.daemon.generic;
  * SOFTWARE.
  */
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.Iterator;
-
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.project.MavenProject;
@@ -47,14 +39,19 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.Iterator;
+
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: GenericDaemonGenerator.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * @version $Id: GenericDaemonGenerator.java 7793 2008-10-02 11:42:01Z kaare $
  * @plexus.component role-hint="generic"
  */
-public class GenericDaemonGenerator
-    extends AbstractLogEnabled
-    implements DaemonGenerator
+public class GenericDaemonGenerator extends AbstractLogEnabled implements DaemonGenerator
 {
     /**
      * @plexus.requirement
@@ -65,13 +62,7 @@ public class GenericDaemonGenerator
     // DaemonGenerator Implementation
     // -----------------------------------------------------------------------
 
-    /*
-     * (non-Javadoc)
-     * @see org.codehaus.mojo.appassembler.daemon.DaemonGenerator#generate(org.codehaus.mojo.appassembler.daemon.
-     * DaemonGenerationRequest)
-     */
-    public void generate( DaemonGenerationRequest request )
-        throws DaemonGeneratorException
+    public void generate( DaemonGenerationRequest request ) throws DaemonGeneratorException
     {
         // -----------------------------------------------------------------------
         // Create the daemon from the Maven project
@@ -143,12 +134,12 @@ public class GenericDaemonGenerator
         complete.getClasspath().addDependency( projectDependency );
 
         // -----------------------------------------------------------------------
-        // Add all the dependencies of the project.
+        // Add all the dependencies from the project.
         // -----------------------------------------------------------------------
         for ( Iterator it = project.getRuntimeArtifacts().iterator(); it.hasNext(); )
         {
             Artifact artifact = (Artifact) it.next();
-
+            
             artifact.isSnapshot();
 
             Dependency dependency = new Dependency();

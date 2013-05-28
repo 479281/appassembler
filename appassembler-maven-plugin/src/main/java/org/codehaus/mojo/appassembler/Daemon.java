@@ -3,7 +3,7 @@ package org.codehaus.mojo.appassembler;
 /*
  * The MIT License
  *
- * Copyright (c) 2006-2012, The Codehaus
+ * Copyright 2005-2008 The Codehaus.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id: Daemon.java 18142 2013-04-01 12:09:59Z khmarbaise $
+ * @version $Id: Daemon.java 12569 2010-09-15 20:26:27Z dennisl $
  */
 public class Daemon
 {
@@ -51,41 +51,21 @@ public class Daemon
 
     private String environmentSetupFileName;
 
-    /**
-     * The daemon id which must be unique.
-     * 
-     * @return The name of the id.
-     */
     public String getId()
     {
         return id;
     }
 
-    /**
-     * The FQN of the main class.
-     * 
-     * @return The name of the main class.
-     */
     public String getMainClass()
     {
         return mainClass;
     }
 
-    /**
-     * The descriptor.
-     * 
-     * @return The descriptor string.
-     */
     public String getDescriptor()
     {
         return descriptor;
     }
 
-    /**
-     * The list of platforms.
-     * 
-     * @return The list of platforms or an empty list if non have been defined before.
-     */
     public List getPlatforms()
     {
         if ( platforms == null )
@@ -96,64 +76,34 @@ public class Daemon
         return platforms;
     }
 
-    /**
-     * Get the list of command line arguments.
-     * 
-     * @return The list of command line arguments.
-     */
     public List getCommandLineArguments()
     {
         return commandLineArguments;
     }
 
-    /**
-     * Get the current JVM settings.
-     * 
-     * @return The instance with the current JVM settings back.
-     */
     public JvmSettings getJvmSettings()
     {
         return jvmSettings;
     }
 
-    /**
-     * Return the generator configurations.
-     * 
-     * @return The list of generator configurations.
-     */
     public List getGeneratorConfigurations()
     {
         return generatorConfigurations;
     }
 
-    /**
-     * Return the state of the {@link #showConsoleWindow} flag.
-     * 
-     * @return true if ShowConsoleWindow is active false otherwise.
-     */
     public boolean isShowConsoleWindow()
     {
         return showConsoleWindow;
     }
 
-    /**
-     * The file name as string.
-     * 
-     * @return The environment setup file name.
-     */
     public String getEnvironmentSetupFileName()
     {
         return environmentSetupFileName;
     }
 
-    /**
-     * Define the environment setup file name.
-     * 
-     * @param environmentSetupFileName The filename as string.
-     */
     public void setEnvironmentSetupFileName( String environmentSetupFileName )
     {
         this.environmentSetupFileName = environmentSetupFileName;
     }
-
+    
 }

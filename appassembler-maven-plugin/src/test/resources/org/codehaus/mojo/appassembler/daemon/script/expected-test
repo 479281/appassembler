@@ -14,26 +14,12 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 # ----------------------------------------------------------------------------
-#
-#   Copyright (c) 2001-2006 The Apache Software Foundation.  All rights
+
+#   Copyright (c) 2001-2002 The Apache Software Foundation.  All rights
 #   reserved.
 
-
-# resolve links - $0 may be a softlink
-PRG="$0"
-
-while [ -h "$PRG" ]; do
-  ls=`ls -ld "$PRG"`
-  link=`expr "$ls" : '.*-> \(.*\)$'`
-  if expr "$link" : '/.*' > /dev/null; then
-    PRG="$link"
-  else
-    PRG=`dirname "$PRG"`/"$link"
-  fi
-done
-
-PRGDIR=`dirname "$PRG"`
-BASEDIR=`cd "$PRGDIR/.." >/dev/null; pwd`
+BASEDIR=`dirname $0`/..
+BASEDIR=`(cd "$BASEDIR"; pwd)`
 
 [ -f "$BASEDIR"/bin/setup ] && . "$BASEDIR"/bin/setup
 
@@ -81,8 +67,8 @@ if [ -z "$JAVACMD" ] ; then
 fi
 
 if [ ! -x "$JAVACMD" ] ; then
-  echo "Error: JAVA_HOME is not defined correctly." 1>&2
-  echo "  We cannot execute $JAVACMD" 1>&2
+  echo "Error: JAVA_HOME is not defined correctly."
+  echo "  We cannot execute $JAVACMD"
   exit 1
 fi
 
@@ -92,6 +78,7 @@ then
 fi
 
 CLASSPATH=$CLASSPATH_PREFIX:
+EXTRA_JVM_ARGUMENTS="Yo dude"
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
@@ -102,12 +89,12 @@ if $cygwin; then
   [ -n "$REPO" ] && REPO=`cygpath --path --windows "$REPO"`
 fi
 
-exec "$JAVACMD" $JAVA_OPTS Yo dude \
+exec "$JAVACMD" $JAVA_OPTS \
+  $EXTRA_JVM_ARGUMENTS \
   -classpath "$CLASSPATH" \
   -Dapp.name="test" \
   -Dapp.pid="$$" \
   -Dapp.repo="$REPO" \
-  -Dapp.home="$BASEDIR" \
   -Dbasedir="$BASEDIR" \
   foo.Bar \
   "$@"
