@@ -4,14 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tanukisoft</groupId>
 	<artifactId>wrapper-delta-pack</artifactId>
-	<version>3.2.3-veda</version>
+	<version>3.2.3</version>
 	<packaging>pom</packaging>
   
-	<properties>
-		<nexus.host>10.1.21.84</nexus.host>
-		<nexus.port>9999</nexus.port>
-    	</properties>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -36,12 +31,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<distributionManagement>
-		<repository>
-			<id>deployment</id>
-			<uniqueVersion>true</uniqueVersion>
-			<url>http://${nexus.host}:${nexus.port}/nexus/content/repositories/releases</url>
-		</repository>
-	</distributionManagement>
 </project>
