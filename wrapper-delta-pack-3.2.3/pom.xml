@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>tanukisoft</groupId>
 	<artifactId>wrapper-delta-pack</artifactId>
-	<version>3.2.3</version>
+	<version>3.2.3_1</version>
 	<packaging>pom</packaging>
   
 	<build>

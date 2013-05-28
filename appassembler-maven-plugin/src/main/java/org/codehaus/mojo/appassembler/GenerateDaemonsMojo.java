@@ -301,9 +301,10 @@ public class GenerateDaemonsMojo
     }
     
     // ignore any empty ones
-    private List<String> getExtraArguments(String[] extraArgs) {
-    	List<String> args = new ArrayList<String>();
-    	for (String s : extraArgs) {
+    private List getExtraArguments(String[] extraArgs) {
+    	List args = new ArrayList();
+    	for (int i=0; i<extraArgs.length ; i++) {
+    	    String s = extraArgs[i];
     		if (s != null && s.trim().length() > 0) {
     			args.add(s);
     		}

@@ -61,8 +61,8 @@ import org.codehaus.plexus.util.StringUtils;
  * @plexus.component role-hint="jsw"
  */
 public class JavaServiceWrapperDaemonGenerator extends AbstractLogEnabled implements DaemonGenerator {
-	private static final Map<String, String> jswPlatformsMap = new HashMap<String, String>() {
-		{
+        private static final Map jswPlatformsMap = new HashMap() { 
+        { 
 			put("linux-x86-32-lib", "lib/libwrapper-linux-x86-32.so");
 			put("linux-x86-32-exec", "bin/wrapper-linux-x86-32");
 			put("linux-x86-64-lib", "lib/libwrapper-linux-x86-64.so");
