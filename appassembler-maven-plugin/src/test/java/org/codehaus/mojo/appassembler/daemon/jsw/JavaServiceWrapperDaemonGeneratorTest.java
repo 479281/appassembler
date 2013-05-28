@@ -314,6 +314,24 @@ public class JavaServiceWrapperDaemonGeneratorTest
                       FileUtils.fileRead( batchFile ) );
     }
 
+    public void testGenerationWithChkConfig() throws Exception {
+        runTest( "jsw", "src/test/resources/project-10/pom.xml", "src/test/resources/project-10/descriptor.xml",
+            "target/output-10-jsw" );
+        
+        File jswDir = getTestFile( "target/output-10-jsw/app" );
+        File wrapper = new File( jswDir, "conf/wrapper.conf" );
+        
+        String wrapperContents = FileUtils.fileRead( wrapper );
+        
+        assertFalse("Wrapper conf contains chkconfig.start", wrapperContents.contains("chkconfig.start"));
+        assertFalse("Wrapper conf contains chkconfig.stop", wrapperContents.contains("chkconfig.stop"));
+        
+        File script = new File( jswDir, "bin/app" );
+        String scriptContents = FileUtils.fileRead( script );
+        
+        assertTrue("Chkconfig replace did not work", scriptContents.contains("chkconfig: 2345 21 81"));
+    }
+    
     public void testGenerationWithWrapperPidFile()
         throws Exception
     {
