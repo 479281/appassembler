@@ -284,7 +284,7 @@ public class GenerateDaemonsMojo
         }
         else
         {
-            modelJvmSettings.setExtraArguments( Arrays.asList( jvmSettings.getExtraArguments() ) );
+            modelJvmSettings.setExtraArguments( getExtraArguments(jvmSettings.getExtraArguments()));
         }
 
         return modelJvmSettings;
@@ -298,5 +298,16 @@ public class GenerateDaemonsMojo
     public void setDaemons( Set daemons )
     {
         this.daemons = daemons;
+    }
+    
+    // ignore any empty ones
+    private List<String> getExtraArguments(String[] extraArgs) {
+    	List<String> args = new ArrayList<String>();
+    	for (String s : extraArgs) {
+    		if (s != null && s.trim().length() > 0) {
+    			args.add(s);
+    		}
+    	}
+    	return args;
     }
 }

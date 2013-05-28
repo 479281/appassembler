@@ -29,58 +29,72 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * The code in this class is taken from DefaultRepositorylayout, located at:
- * http://svn.apache.org/viewvc/maven/components/trunk/maven-artifact/src/main/java/org/apache/maven/artifact/repository/layout/DefaultRepositoryLayout.java
- *
+ * http
+ * ://svn.apache.org/viewvc/maven/components/trunk/maven-artifact/src/main/java
+ * /org/apache/maven/artifact/repository/layout/DefaultRepositoryLayout.java
+ * 
  * @version $Id: FlatRepositoryLayout.java 9147 2009-03-04 23:18:27Z trygvis $
- * @plexus.component role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout" role-hint="flat"
+ * @plexus.component 
+ *                   role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout"
+ *                   role-hint="flat"
  */
-public class FlatRepositoryLayout
-    implements ArtifactRepositoryLayout
-{
-    private static final char ARTIFACT_SEPARATOR = '-';
+public class FlatRepositoryLayout implements ArtifactRepositoryLayout {
+	private static final char ARTIFACT_SEPARATOR = '-';
 
-    private static final char GROUP_SEPARATOR = '.';
+	private static final char GROUP_SEPARATOR = '.';
 
-    public String pathOf( Artifact artifact )
-    {
-        ArtifactHandler artifactHandler = artifact.getArtifactHandler();
+	private final String finalNameTemplate;
 
-        StringBuffer path = new StringBuffer();
+	/**
+	 * Variables supported are:
+	 * 
+	 * ${project.groupId} ${project.artifactId} ${project.version}
+	 * 
+	 * @param finalNameTemplate
+	 */
+	public FlatRepositoryLayout() {
+		this.finalNameTemplate = "${project.groupId}.${project.artifactId}-${project.version}";
+	}
 
-        path.append( artifact.getArtifactId() ).append( ARTIFACT_SEPARATOR ).append( artifact.getVersion() );
+	public String pathOf(Artifact artifact) {
+		ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
-        if ( artifact.hasClassifier() )
-        {
-            path.append( ARTIFACT_SEPARATOR ).append( artifact.getClassifier() );
-        }
+		StringBuffer path = new StringBuffer();
 
-        if ( artifactHandler.getExtension() != null && artifactHandler.getExtension().length() > 0 )
-        {
-            path.append( GROUP_SEPARATOR ).append( artifactHandler.getExtension() );
-        }
+		String finalName = finalNameTemplate;
+		finalName = StringUtils.replace(finalName, "${project.groupId}", artifact.getGroupId());
+		finalName = StringUtils.replace(finalName, "${project.artifactId}", artifact.getArtifactId());
+		finalName = StringUtils.replace(finalName, "${project.version}", artifact.getVersion());
+		path.append(finalName);
 
-        return path.toString();
-    }
+		if (artifact.hasClassifier()) {
+			path.append(ARTIFACT_SEPARATOR).append(artifact.getClassifier());
+		}
 
-    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
-    {
-        return pathOfRepositoryMetadata( metadata.getLocalFilename( repository ) );
-    }
+		if (artifactHandler.getExtension() != null && artifactHandler.getExtension().length() > 0) {
+			path.append(GROUP_SEPARATOR).append(artifactHandler.getExtension());
+		}
 
-    private String pathOfRepositoryMetadata( String filename )
-    {
-        StringBuffer path = new StringBuffer();
+		return path.toString();
+	}
 
-        path.append( filename );
+	public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
+		return pathOfRepositoryMetadata(metadata.getLocalFilename(repository));
+	}
 
-        return path.toString();
-    }
+	private String pathOfRepositoryMetadata(String filename) {
+		StringBuffer path = new StringBuffer();
 
-    public String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata )
-    {
-        return pathOfRepositoryMetadata( metadata.getRemoteFilename() );
-    }
+		path.append(filename);
+
+		return path.toString();
+	}
+
+	public String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata) {
+		return pathOfRepositoryMetadata(metadata.getRemoteFilename());
+	}
 }

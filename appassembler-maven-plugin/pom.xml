@@ -24,11 +24,6 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>appassembler</artifactId>
-    <groupId>org.codehaus.mojo.appassembler</groupId>
-    <version>1.1.1</version>
-  </parent>
   <groupId>org.codehaus.mojo</groupId>
   <artifactId>appassembler-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
@@ -45,16 +40,18 @@
       <name>Mathieu Champlon</name>
     </contributor>
   </contributors>
+  
   <dependencies>
     <dependency>
       <groupId>org.codehaus.mojo.appassembler</groupId>
       <artifactId>appassembler-model</artifactId>
-      <version>${project.version}</version>
+      <version>1.1.1</version>
     </dependency>
+    
     <dependency>
       <groupId>org.codehaus.mojo.appassembler</groupId>
       <artifactId>appassembler-booter</artifactId>
-      <version>${project.version}</version>
+      <version>1.1.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -88,10 +85,13 @@
       <artifactId>plexus-container-default</artifactId>
       <version>1.0-alpha-9-stable-1</version>
     </dependency>
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>3.8.1</version>
     </dependency>
+    
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-settings</artifactId>
@@ -133,7 +133,7 @@
                 <artifactItem>
                   <groupId>tanukisoft</groupId>
                   <artifactId>wrapper-delta-pack</artifactId>
-                  <version>3.2.3</version>
+                  <version>3.2.3-veda</version>
                   <type>tar.gz</type>
                 </artifactItem>
               </artifactItems>
@@ -147,7 +147,7 @@
     </plugins>
     <resources>
       <resource>
-        <directory>target/dependency/wrapper-delta-pack-3.2.3/src/conf</directory>
+        <directory>target/dependency/src/conf</directory>
         <targetPath>org/codehaus/mojo/appassembler/daemon/jsw/conf</targetPath>
       </resource>
       <resource>
@@ -158,15 +158,15 @@
         </includes>
       </resource>
       <resource>
-        <directory>target/dependency/wrapper-delta-pack-3.2.3/src/bin</directory>
+        <directory>target/dependency/src/bin</directory>
         <targetPath>org/codehaus/mojo/appassembler/daemon/jsw/bin</targetPath>
         <includes>
           <include>AppCommand.bat.in</include>
         </includes>
       </resource>
-      <!-- TODO: Have the plugin copy these in (depending on platforms) -->
+      
       <resource>
-        <directory>target/dependency/wrapper-delta-pack-3.2.3/lib</directory>
+        <directory>target/dependency/lib</directory>
         <targetPath>org/codehaus/mojo/appassembler/daemon/jsw/lib</targetPath>
         <includes>
           <include>wrapper.jar</include>
@@ -174,56 +174,26 @@
           <include>libwrapper-*</include>
         </includes>
       </resource>
-      <!-- TODO: Have the plugin copy these in (depending on platforms) -->
+      
       <resource>
-        <directory>target/dependency/wrapper-delta-pack-3.2.3/bin</directory>
+        <directory>target/dependency/bin</directory>
         <targetPath>org/codehaus/mojo/appassembler/daemon/jsw/bin</targetPath>
         <includes>
           <include>wrapper-*</include>
         </includes>
       </resource>
+      
+      <resource>
+        <directory>target/dependency/logs</directory>
+        <targetPath>org/codehaus/mojo/appassembler/daemon/jsw/logs</targetPath>
+        <includes>
+          <include>wrapper.log</include>
+        </includes>
+      </resource>
+      
       <resource>
         <directory>src/main/resources</directory>
       </resource>
     </resources>
   </build>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>shitty-maven-plugin</artifactId>
-            <version>1.0-alpha-3</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>clean</goal>
-                  <goal>install</goal>
-                  <goal>test</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <projects>
-                <project>
-                  <directory>src/it</directory>
-                  <includes>
-                    <include>${its}/pom.xml</include>
-                  </includes>
-                </project>
-              </projects>
-              <threadCount>${threadCount}</threadCount>
-              <parallel>true</parallel>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-  <properties>
-    <its>*</its>
-    <threadCount>2</threadCount>
-  </properties>
 </project>

@@ -31,7 +31,8 @@ fi
 PRIORITY=
 
 # Location of the pid file.
-PIDDIR="$@app.base.envvar@/logs"
+#PIDDIR="$@app.base.envvar@/logs"
+@pid.dir.envvar@
 
 # If uncommented, causes the Wrapper to be shutdown using an anchor file.
 #  When launched with the 'start' command, it will also ignore all INT and
@@ -50,7 +51,7 @@ PIDDIR="$@app.base.envvar@/logs"
 @run.as.user.envvar@
 # The following two lines are used by the chkconfig command. Change as is
 #  appropriate for your application.  They should remain commented.
-# chkconfig: 2345 20 80
+# chkconfig: 2345 @chkconfig.start@ @chkconfig.stop@
 # description: @app.long.name@
 
 # Do not modify anything beyond this point
