@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>tanukisoft</groupId>
+	<artifactId>wrapper-delta-pack</artifactId>
+	<version>3.2.3-veda</version>
+	<packaging>pom</packaging>
+  
+	<properties>
+		<nexus.host>10.1.21.84</nexus.host>
+		<nexus.port>9999</nexus.port>
+    	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2</version>
+
+				<executions>
+					<execution>
+						<id>tarball</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptor>src/main/resources/assemblies/tarball.xml</descriptor>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<distributionManagement>
+		<repository>
+			<id>deployment</id>
+			<uniqueVersion>true</uniqueVersion>
+			<url>http://${nexus.host}:${nexus.port}/nexus/content/repositories/releases</url>
+		</repository>
+	</distributionManagement>
+</project>
