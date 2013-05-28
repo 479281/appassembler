@@ -26,6 +26,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.codehaus.mojo</groupId>
   <artifactId>appassembler-maven-plugin</artifactId>
+  <version>1.1.1</version>
   <packaging>maven-plugin</packaging>
   <name>Appassembler :: Maven Plug-In</name>
   <description>A Mojo for generating bin scripts for Java applications.</description>
