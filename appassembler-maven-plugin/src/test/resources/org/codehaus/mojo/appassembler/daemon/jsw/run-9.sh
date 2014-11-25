@@ -89,6 +89,18 @@ PIDDIR="$BASEDIR/test"
 # chkconfig: 2345 20 80
 # description: Test Project
 
+### BEGIN INIT INFO
+# Provides:          app
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Should-Start:      $network $time
+# Should-Stop:       $network $time
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Test Project
+# Description:       Test Project
+### END INIT INFO
+
 # Do not modify anything beyond this point
 #-----------------------------------------------------------------------------
 
