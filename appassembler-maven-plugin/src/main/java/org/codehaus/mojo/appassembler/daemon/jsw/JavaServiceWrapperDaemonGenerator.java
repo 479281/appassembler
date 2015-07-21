@@ -125,24 +125,28 @@ public class JavaServiceWrapperDaemonGenerator
             runAsUserEnvVar = "RUN_AS_USER=" + runAsUserEnvVar;
             configuration.remove( "run.as.user.envvar" );
         }
-        String pidFile = configuration.getProperty( "wrapper.pidfile", "$BASEDIR/logs" );
+        String wrapperPidFile = configuration.getProperty( "wrapper.pidfile", "$BASEDIR/logs" );
         
         // Don't want these in the wrapper.conf file
         String chkconfigStart = configuration.getProperty( "chkconfig.start", "20" );
         configuration.remove("chkconfig.start");
         String chkconfigStop = configuration.getProperty( "chkconfig.stop", "80" );
         configuration.remove("chkconfig.stop");
+        String pidFile = configuration.getProperty( "pidFile", wrapperPidFile + "/@app.name@.pid" );
+        configuration.remove("pidFile");
         
         Properties context = createContext( request, daemon );
         context.setProperty( "app.base.envvar", appBaseEnvVar );
-        context.setProperty( "wrapper.pidfile", pidFile );
+        context.setProperty( "wrapper.pidfile", wrapperPidFile );
         context.setProperty( "run.as.user.envvar", runAsUserEnvVar );
         context.setProperty( "wrapper.conf.fileName", this.getWrapperConfigFileName( daemon ) );
         context.setProperty( "chkconfig.start", chkconfigStart);
         context.setProperty( "chkconfig.stop", chkconfigStop);
+        context.setProperty( "pidFile", pidFile);
         
         writeWrapperConfFile( request, daemon, outputDirectory, context, configuration );
 
+        
         writeScriptFiles( request, daemon, outputDirectory, context );
 
         List jswPlatformIncludes = getJswPlatformIncludes( daemon );
@@ -449,6 +453,7 @@ public class JavaServiceWrapperDaemonGenerator
         throws DaemonGeneratorException
     {
         InputStream shellScriptInputStream = null;
+        InputStream systemdScriptInputStream = null;
         InputStream batchFileInputStream = null;
         try
         {
@@ -464,6 +469,17 @@ public class JavaServiceWrapperDaemonGenerator
 
             writeFilteredFile( request, daemon, reader, new File( outputDirectory, "bin/" + daemon.getId() ), context );
 
+            systemdScriptInputStream = getSystemdTemplate( daemon );
+
+            if ( systemdScriptInputStream == null )
+            {
+                throw new DaemonGeneratorException( "Could not load template." );
+            }
+
+            reader = new InputStreamReader( systemdScriptInputStream );
+
+            writeFilteredFile( request, daemon, reader, new File( outputDirectory, "bin/" + daemon.getId() + ".service" ), context );
+            
             batchFileInputStream = this.getWindowsTemplate( daemon );
 
             if ( batchFileInputStream == null )
@@ -488,6 +504,12 @@ public class JavaServiceWrapperDaemonGenerator
     {
         return getTemplate( daemon.getUnixScriptTemplate(), "bin/sh.script.in" );
     }
+    
+    private InputStream getSystemdTemplate( Daemon daemon )
+            throws DaemonGeneratorException
+        {
+            return getTemplate( daemon.getUnixScriptTemplate(), "bin/service.template.in" );
+        }
 
     private InputStream getWindowsTemplate( Daemon daemon )
         throws DaemonGeneratorException

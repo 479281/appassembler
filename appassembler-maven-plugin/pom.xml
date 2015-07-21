@@ -34,6 +34,7 @@
   <artifactId>appassembler-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Appassembler :: Maven Plug-In</name>
+  <version>1.3.3-pellcorp</version>
   <description>A Mojo for generating bin scripts for Java applications.</description>
 
   <properties>
@@ -64,7 +65,7 @@
     <dependency>
       <groupId>org.codehaus.mojo.appassembler</groupId>
       <artifactId>appassembler-model</artifactId>
-      <version>${project.version}</version>
+      <version>1.3.1</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -218,8 +219,10 @@
         <includes>
           <include>sh.script.in</include>
           <include>AppCommand.bat.in</include>
+          <include>service.template.in</include>
         </includes>
       </resource>
+      
       <!-- TODO: Have the plugin copy these in (depending on platforms) -->
       <resource>
         <directory>target/dependency/wrapper-delta-pack-3.2.3/lib</directory>
@@ -427,4 +430,11 @@
 
   </profiles>
 
+
+	<distributionManagement>
+		<repository>
+			<id>repo</id>
+			<url>${maven.repo.dir}/releases</url>
+		</repository>
+	</distributionManagement>
 </project>

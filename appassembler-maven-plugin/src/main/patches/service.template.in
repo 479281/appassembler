@@ -1,0 +1,14 @@
+[Unit]
+Description=@app.long.name@
+After=network.target auditd.service
+
+[Service]
+Type=forking
+KillMode=process
+GuessMainPID=no
+PIDFile=@pidFile@
+ExecStart=/etc/init.d/@app.name@ start
+ExecStop=/etc/init.d/@app.name@ stop
+
+[Install]
+WantedBy=multi-user.target
