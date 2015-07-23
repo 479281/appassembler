@@ -478,7 +478,7 @@ public class JavaServiceWrapperDaemonGenerator
 
             reader = new InputStreamReader( systemdScriptInputStream );
 
-            writeFilteredFile( request, daemon, reader, new File( outputDirectory, "bin/" + daemon.getId() + ".service" ), context );
+            writeFilteredFile( request, daemon, reader, new File( outputDirectory, "conf/" + daemon.getId() + ".service" ), context );
             
             batchFileInputStream = this.getWindowsTemplate( daemon );
 
@@ -496,6 +496,7 @@ public class JavaServiceWrapperDaemonGenerator
         {
             IOUtil.close( shellScriptInputStream );
             IOUtil.close( batchFileInputStream );
+            IOUtil.close( systemdScriptInputStream );
         }
     }
 
