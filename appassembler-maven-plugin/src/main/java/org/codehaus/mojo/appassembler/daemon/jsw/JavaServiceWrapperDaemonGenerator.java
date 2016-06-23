@@ -365,7 +365,7 @@ public class JavaServiceWrapperDaemonGenerator
         confFile.setProperty( wrapperClassPathPrefix + counter++, "lib/wrapper.jar" );
 
         String configurationDirFirst = configuration.getProperty( "configuration.directory.in.classpath.first" );
-        if ( configurationDirFirst != null )
+        if ( configurationDirFirst != null && configurationDirFirst.trim().length() > 0)
         {
             confFile.setProperty( wrapperClassPathPrefix + counter++, configurationDirFirst );
         }
